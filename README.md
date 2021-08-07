@@ -81,3 +81,11 @@ https://github.com/muumimorko/MSFS2020_CGLTools/issues/2#issuecomment-762232597)
   ![mitmproxy](./doc/mitm-2.png)
 * 尽情享用吧
   ![](./doc/xian.png)
+
+# 赞助
+
+如果你已经成功的实现了，请给个star，让更多人看到！
+如果你愿意给与作者一些赞助，请扫描以下二维码支持一下作者。
+
+![微信](./doc/mm_reward_qrcode_1628320842310.png)
+![阿里](./doc/1628320893.jpg)
