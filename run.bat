@@ -1,1 +1,1 @@
-mitmproxy --script mitm.py
+mitmdump --script mitm.py

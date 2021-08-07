@@ -2,6 +2,7 @@ import requests
 from mitmproxy import http
 import re
 from mitmproxy.script import concurrent
+import os
 
 proxy_url = None
 
@@ -11,6 +12,7 @@ proxy_url = "http://192.168.3.191:8118"
 
 proxies = {"https": proxy_url} if proxy_url is not None else None
 regex = r"/tiles/akh(\d+).jpeg"
+
 
 def quad_key_to_tileXY(quadKey):
     tileX = tileY = 0
@@ -39,12 +41,24 @@ def request(flow: http.HTTPFlow) -> None:
         quadkey = re.findall(regex, flow.request.path)[0]
         tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
 
+        dir = f"./cache/{tileX}/{tileY}"
+        os.makedirs(dir, exist_ok=True)
+
+        cache_file = f"{dir}/{levelOfDetail}.jpeg"
+
         url = f"https://khms0.google.com/kh/v=908?x={tileX}&y={tileY}&z={levelOfDetail}"
 
-        # print(url)
+        if os.path.exists(cache_file):
+            with open(cache_file, "rb") as f:
+                content = f.read()
+        else:
+            # print(url)
+            content = requests.get(
+                url, proxies=proxies, timeout=5).content
 
-        content = requests.get(
-            url, proxies=proxies, timeout=5).content
+            with open(cache_file, "wb") as f:
+                f.write(content)
+
         flow.response = http.Response.make(200, content,
                                            {"Content-Type": "image/jpeg",
                                             "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT",
