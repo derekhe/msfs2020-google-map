@@ -32,9 +32,17 @@ def quad_key_to_tileXY(quadKey):
 
 @concurrent
 def request(flow: http.HTTPFlow) -> None:
-    if ("tsom_cc_activation_masks" in flow.request.path) or ("texture_synthesis_online_map_high_res" in flow.request.path) or ("color_corrected_images" in flow.request.path):
-        flow.response = http.Response.make(404)
-        return
+    disabled_links = [
+         #'tsom_cc_activation_masks',
+         'coverage_maps', 
+         'texture_synthesis_online_map_high_res',
+         'color_corrected_images'
+          ]
+
+    for disabled_link in disabled_links:
+        if disabled_link in flow.request.path:
+            flow.response = http.Response.make(404)
+            return
 
     if (flow.request.pretty_host == "kh.ssl.ak.tiles.virtualearth.net") and ("/tiles/akh" in flow.request.path):
         # print(flow.request.path)
