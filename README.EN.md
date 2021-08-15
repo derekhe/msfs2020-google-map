@@ -17,6 +17,11 @@ Replace the local DNS and replace the Microsoft server with the local server. Pl
 * Start flight simulation
 * Enjoy
 
+To uninstall, please remove the lines in `C:\Windows\System32\drivers\etc\hosts` file:
+
+127.0.0.1	kh.ssl.ak.tiles.virtualearth.net
+127.0.0.1	khstorelive.azureedge.net
+
 ## background
 
 Microsoft Flight Simulator 2020 uses Bing's satellite map. However, the satellite map is relatively old, and many areas are not directly equipped with map settings a few years ago. This phenomenon occurs in different regions of the world. The map on the mainland is even 10 years ago. There are a large number of regions where satellite images are not available. Microsoft uses the program-generated map instead, and the quality is very poor. After the replacement, the image quality and details have been significantly improved, as shown in the figure below
