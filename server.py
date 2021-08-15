@@ -8,6 +8,7 @@ from configparser import ConfigParser
 from python_hosts import Hosts, HostsEntry
 import ctypes, sys
 import webbrowser
+from diskcache import Cache
 
 def is_admin():
     try:
@@ -28,6 +29,7 @@ for domain in domains:
     my_hosts.add([new_entry])
 my_hosts.write()
 
+cache = Cache("./cache", size_limit=10*1024*1024*1024, shards=10)
 app = Flask(__name__)
 conf = ConfigParser()
 conf.read('config.ini')
@@ -64,23 +66,15 @@ def tiles(path):
     quadkey = re.findall(regex, path)[0]
     tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
 
-    dir = f"./cache/{levelOfDetail}/{tileX}/"
-    os.makedirs(dir, exist_ok=True)
-
-    cache_file = f"{dir}/{tileX}-{tileY}.jpeg"
-
     url = f"https://mt1.google.com/vt/lyrs=s&x={tileX}&y={tileY}&z={levelOfDetail}"
 
-    if os.path.exists(cache_file):
-        with open(cache_file, "rb") as f:
-            content = f.read()
-    else:
+    content = cache.get(path)
+    if content is None:
         print(url)
         content = requests.get(
             url, proxies=proxies, timeout=15).content
-
-        with open(cache_file, "wb") as f:
-            f.write(content)
+        
+        cache.set(path, content)
 
     response = make_response(content)
     headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580", "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035", "X-VE-ID": "4862_136744347",
