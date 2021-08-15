@@ -1,10 +1,14 @@
 from flask import Flask, make_response
 import re
 import os
+import subprocess
 import requests
 from flask import request
 from configparser import ConfigParser
 from python_hosts import Hosts, HostsEntry
+
+
+subprocess.run(["certutil", "-addstore","-f", "root", ".\certs\cert.crt"], shell=True, check=True)
 
 my_hosts = Hosts()
 domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
