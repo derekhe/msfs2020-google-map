@@ -7,6 +7,7 @@ from flask import request
 from configparser import ConfigParser
 from python_hosts import Hosts, HostsEntry
 import ctypes, sys
+import webbrowser
 
 def is_admin():
     try:
@@ -93,5 +94,6 @@ def tiles(path):
 
 
 if __name__ == "__main__":
+    webbrowser.open("https://github.com/derekhe/msfs2020-google-map")
     app.run(ssl_context=('certs/cert.pem', 'certs/key.pem'),
             port=443, host="0.0.0.0", threaded=True)
