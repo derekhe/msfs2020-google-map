@@ -9,14 +9,11 @@ The methods mentioned in this tutorial are for research and learning purposes on
 
 Replace the local DNS and replace the Microsoft server with the local server. Please install the tools involved
 * An HTTP proxy that can access Google
-* [python3](https://www.python.org/downloads/)
-  * Install the 3.8 version of **all content**
-
 ## Steps for usage
 
-* **Important Steps** Double-click `certs/cert.crt` and select "Install Certificate", "Local Computer", "Put all certificates in the following store" (Certificate store select *Trusted Root Certification Authorities* )
+* Download the release compressed package and unzip it
 * Modify the `url` in config.ini to the proxy that you can access Google
-* **Run `run.bat` with administrator privileges in the current directory to start the server
+* Run `server.exe` to start the server
 * Start flight simulation
 * Enjoy
 
