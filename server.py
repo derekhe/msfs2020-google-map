@@ -6,7 +6,16 @@ import requests
 from flask import request
 from configparser import ConfigParser
 from python_hosts import Hosts, HostsEntry
+import ctypes, sys
 
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+if not is_admin():
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
 
 subprocess.run(["certutil", "-addstore","-f", "root", ".\certs\cert.crt"], shell=True, check=True)
 
@@ -27,7 +36,6 @@ print("Proxy url", proxy_url)
 
 proxies = {"https": proxy_url} if proxy_url is not None else None
 regex = r"akh(\d+).jpeg"
-
 
 def quad_key_to_tileXY(quadKey):
     tileX = tileY = 0
@@ -85,7 +93,5 @@ def tiles(path):
 
 
 if __name__ == "__main__":
-
-
     app.run(ssl_context=('certs/cert.pem', 'certs/key.pem'),
             port=443, host="0.0.0.0", threaded=True)
