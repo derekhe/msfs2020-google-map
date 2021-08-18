@@ -11,7 +11,6 @@ import sys
 import webbrowser
 from diskcache import Cache
 
-
 def run_as_admin():
     def is_admin():
         try:
@@ -41,15 +40,20 @@ def override_hosts():
             entry_type='ipv4', address='127.0.0.1', names=[domain])
         my_hosts.add([new_entry])
     my_hosts.write()
-    print("Done hosts")
+    print("Done override hosts")
 
 
 def config_proxy():
     conf = ConfigParser()
     conf.read('config.ini')
+    proxy_url = None
+    if conf['proxy']:
+        proxy_url = conf['proxy']['url']
 
-    proxy_url = conf['proxy']['url']
-    print("Proxy url", proxy_url)
+    if proxy_url is None:
+        proxy_url = os.getenv("http_proxy")
+
+    print("Proxy url is", proxy_url)
 
     return {"https": proxy_url} if proxy_url is not None else None
 

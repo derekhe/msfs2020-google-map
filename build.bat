@@ -1,3 +1,3 @@
 pyinstaller server.spec --onefile
-copy -R certs .\dist\
+xcopy  certs .\dist\certs\
 copy config.ini .\dist\
