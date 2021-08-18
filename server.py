@@ -6,39 +6,62 @@ import requests
 from flask import request
 from configparser import ConfigParser
 from python_hosts import Hosts, HostsEntry
-import ctypes, sys
+import ctypes
+import sys
 import webbrowser
 from diskcache import Cache
 
-def is_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
 
-if not is_admin():
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+def run_as_admin():
+    def is_admin():
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except:
+            return False
 
-subprocess.run(["certutil", "-addstore","-f", "root", ".\certs\cert.crt"], shell=True, check=True)
+    if not is_admin():
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, __file__, None, 1)
 
-my_hosts = Hosts()
-domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
-for domain in domains:
-    my_hosts.remove_all_matching(name=domain)
-    new_entry = HostsEntry(entry_type='ipv4', address='127.0.0.1', names=[domain])
-    my_hosts.add([new_entry])
-my_hosts.write()
+
+def add_cert():
+    print("Adding certificate to root")
+    subprocess.run(["certutil", "-addstore", "-f", "root",
+                    ".\certs\cert.crt"], shell=True, check=True)
+    print("Successfully added certificate to root")
+
+
+def override_hosts():
+    print("Overriding hosts")
+    my_hosts = Hosts()
+    domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
+    for domain in domains:
+        my_hosts.remove_all_matching(name=domain)
+        new_entry = HostsEntry(
+            entry_type='ipv4', address='127.0.0.1', names=[domain])
+        my_hosts.add([new_entry])
+    my_hosts.write()
+    print("Done hosts")
+
+
+def config_proxy():
+    conf = ConfigParser()
+    conf.read('config.ini')
+
+    proxy_url = conf['proxy']['url']
+    print("Proxy url", proxy_url)
+
+    return {"https": proxy_url} if proxy_url is not None else None
+
+
+run_as_admin()
+add_cert()
+override_hosts()
 
 cache = Cache("./cache", size_limit=10*1024*1024*1024, shards=10)
+proxies = config_proxy()
 app = Flask(__name__)
-conf = ConfigParser()
-conf.read('config.ini')
 
-proxy_url = conf['proxy']['url']
-print("Proxy url", proxy_url)
-
-proxies = {"https": proxy_url} if proxy_url is not None else None
-regex = r"akh(\d+).jpeg"
 
 def quad_key_to_tileXY(quadKey):
     tileX = tileY = 0
@@ -63,7 +86,7 @@ def tiles(path):
             request.url, proxies=proxies, timeout=30).content
         return content
 
-    quadkey = re.findall(regex, path)[0]
+    quadkey = re.findall(r"akh(\d+).jpeg", path)[0]
     tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
 
     url = f"https://mt1.google.com/vt/lyrs=s&x={tileX}&y={tileY}&z={levelOfDetail}"
@@ -73,7 +96,7 @@ def tiles(path):
         print(url)
         content = requests.get(
             url, proxies=proxies, timeout=15).content
-        
+
         cache.set(path, content)
 
     response = make_response(content)
@@ -88,6 +111,6 @@ def tiles(path):
 
 
 if __name__ == "__main__":
-    webbrowser.open("https://github.com/derekhe/msfs2020-google-map")
+    webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
     app.run(ssl_context=('certs/cert.pem', 'certs/key.pem'),
             port=443, host="0.0.0.0", threaded=True)
