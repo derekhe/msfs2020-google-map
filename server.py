@@ -42,10 +42,10 @@ def override_hosts():
     my_hosts.write()
     print("Done override hosts")
 
+conf = ConfigParser()
+conf.read('config.ini')
 
 def config_proxy():
-    conf = ConfigParser()
-    conf.read('config.ini')
     proxy_url = None
     if conf['proxy']:
         proxy_url = conf['proxy']['url']
@@ -62,7 +62,7 @@ run_as_admin()
 add_cert()
 override_hosts()
 
-cache = Cache("./cache", size_limit=10*1024*1024*1024, shards=10)
+cache = Cache("./cache", size_limit=int(conf['offline']['max_cache_size_G'])*1024*1024*1024, shards=10)
 proxies = config_proxy()
 app = Flask(__name__)
 
@@ -94,14 +94,17 @@ def tiles(path):
     tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
 
     url = f"https://mt1.google.com/vt/lyrs=s&x={tileX}&y={tileY}&z={levelOfDetail}"
-
-    content = cache.get(path)
+    
+    cache_key = f"{levelOfDetail}{tileX}{tileY}"
+    content = cache.get(cache_key)
     if content is None:
-        print(url)
+        print("Downloading from:", url)
         content = requests.get(
             url, proxies=proxies, timeout=15).content
 
-        cache.set(path, content)
+        cache.set(cache_key, content)
+    else:
+        print("Use cached:", url)
 
     response = make_response(content)
     headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580", "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035", "X-VE-ID": "4862_136744347",

@@ -1,6 +1,5 @@
-# [English verison here](./README.EN.md)
+# English verison
 
-# Chinese
 ## Disclaimer
 
 The methods mentioned in this tutorial are for research and learning purposes only. I am not responsible for any legal liabilities and losses caused by using or expanding this tutorial and method.
@@ -17,10 +16,29 @@ Replace the local DNS and replace the Microsoft server with the local server. Pl
 * Start flight simulation
 * Enjoy
 
-To uninstall, please remove the lines in `C:\Windows\System32\drivers\etc\hosts` file:
+To restore the previous state, please delete
+The following two lines in the `C:\Windows\System32\drivers\etc\hosts` file:
+```
+127.0.0.1 kh.ssl.ak.tiles.virtualearth.net
+127.0.0.1 khstorelive.azureedge.net
+```
 
-127.0.0.1	kh.ssl.ak.tiles.virtualearth.net
-127.0.0.1	khstorelive.azureedge.net
+## Offline download
+
+In order to solve the problem of real-time loading, you can use the built-in offline loading of msfs2020, but it is not easy to operate.
+So I made an `offline-cache.exe` for downloading, and the map can be preloaded. After that, the map is loaded very quickly.
+Edit the following fragment in the `config.ini` file. It is not recommended to use too large range and too fine series.
+
+```
+[offline]
+# Use https://www.google.com/maps to get coordinate points
+north_west = 46.357879198300516, 83.39287198273128
+south_east = 22.89205887817234, 123.91045032827455
+# From how many levels to how many levels, the maximum is 18 levels
+range = 5, 12
+# The maximum number of G for the cache
+max_cache_size_G = 20
+```
 
 ## background
 
