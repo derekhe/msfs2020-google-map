@@ -86,6 +86,9 @@ def quad_key_to_tileXY(quadKey):
 @app.route("/tiles/<path>")
 def tiles(path):
     if "akh" not in path:
+        if proxies is None:
+            return make_response("", 404)
+            
         content = requests.get(
             request.url, proxies=proxies, timeout=30).content
         return content
