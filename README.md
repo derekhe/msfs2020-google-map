@@ -14,10 +14,11 @@
 * 下载release压缩包并解压
 * 修改config.ini中的`url`到你能访问Google的代理
 * 运行`server.exe`启动服务器
-* 启动模拟飞行
+* 启动模拟飞行，保留命令行的黑窗口
 * 尽情享用吧
+* 如需关闭，请在命令行窗口中按`ctrl+c`，以使hosts文件恢复正常
 
-如要恢复之前的状态，请删除
+如果hosts文件需要手动恢复，请删除
 `C:\Windows\System32\drivers\etc\hosts`文件中的如下两行:
 ```
 127.0.0.1	kh.ssl.ak.tiles.virtualearth.net

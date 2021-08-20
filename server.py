@@ -10,6 +10,7 @@ import ctypes
 import sys
 import webbrowser
 from diskcache import Cache
+import atexit
 
 def run_as_admin():
     def is_admin():
@@ -29,11 +30,11 @@ def add_cert():
                     ".\certs\cert.crt"], shell=True, check=True)
     print("Successfully added certificate to root")
 
+my_hosts = Hosts()
+domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
 
 def override_hosts():
     print("Overriding hosts")
-    my_hosts = Hosts()
-    domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
     for domain in domains:
         my_hosts.remove_all_matching(name=domain)
         new_entry = HostsEntry(
@@ -41,6 +42,14 @@ def override_hosts():
         my_hosts.add([new_entry])
     my_hosts.write()
     print("Done override hosts")
+
+def restore_hosts():
+    print("Restoring hosts")
+    for domain in domains:
+        my_hosts.remove_all_matching(name=domain)
+    my_hosts.write()
+
+atexit.register(restore_hosts)
 
 conf = ConfigParser()
 conf.read('config.ini')

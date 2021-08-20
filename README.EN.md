@@ -12,9 +12,10 @@ Replace the local DNS and replace the Microsoft server with the local server. Pl
 
 * Download the release compressed package and unzip it
 * Modify the `url` in config.ini to the proxy that you can access Google
-* Run `server.exe` to start the server
+* Run `server.exe` to start the server, keep the command line screen open
 * Start flight simulation
 * Enjoy
+* If you want exit the game, please close the command line using `ctrl+c`
 
 To restore the previous state, please delete
 The following two lines in the `C:\Windows\System32\drivers\etc\hosts` file:
