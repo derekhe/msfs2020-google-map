@@ -24,7 +24,7 @@
 ## 使用步骤
 
 * 下载release压缩包并解压
-* 修改config.ini中的`url`到你能访问Google的代理
+* 修改config.ini中的`url`到你能访问Google的代理(如果你能直接访问谷歌，则将这一行删除即可）
 * 运行`server.exe`启动服务器
 * 启动模拟飞行，保留命令行的黑窗口
 * 尽情享用吧
