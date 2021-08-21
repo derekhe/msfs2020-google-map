@@ -24,6 +24,9 @@ Replace the local DNS and replace the Microsoft server with the local server. Pl
 
 ## Steps for usage
 
+Some virus app reports errors and when in game it promote for https certificate error. If so, please add the folder to whitelist and accept the certificate error.
+The software is totally open source and you can check every piece of code here: https://github.com/derekhe/msfs2020-google-map
+
 * Download the release compressed package and unzip it
 * Modify the `url` in config.ini to the proxy that you can access Google (if you are not in China, please delete this line)
 * Run `server.exe` to start the server, keep the command line screen open
