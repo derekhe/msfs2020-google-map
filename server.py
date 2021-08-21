@@ -112,7 +112,7 @@ def tiles(path):
     if content is None:
         print("Downloading from:", url)
         content = requests.get(
-            url, proxies=proxies, timeout=15).content
+            url, proxies=proxies, timeout=30).content
 
         cache.set(cache_key, content)
     else:
