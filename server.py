@@ -99,7 +99,7 @@ def tiles(path):
             return make_response("", 404)
             
         content = requests.get(
-            request.url, proxies=proxies, timeout=30).content
+            request.url, proxies=proxies, timeout=30, verify=False).content
         return content
 
     quadkey = re.findall(r"akh(\d+).jpeg", path)[0]
