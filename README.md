@@ -29,6 +29,7 @@
 * 修改config.ini中的`url`到你能访问Google的代理(如果你能直接访问谷歌，则将这一行删除即可）
 * 运行`server.exe`启动服务器
 * 启动模拟飞行，保留命令行的黑窗口
+* 保证游戏中在线地图功能打开（BING DATA WORLD GRAPHICS和PHOTOGRAMMETRY），否则只能获得离线地图
 * 尽情享用吧
 * 如需关闭，请在命令行窗口中按`ctrl+c`，以使hosts文件恢复正常
 
