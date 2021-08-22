@@ -44,7 +44,7 @@ def download_image(tile_x, tile_y, level_of_detail, i, total):
         cache.set(cache_key, content)
 
 print(f"Start from {north_west} to {south_east}")
-with ThreadPoolExecutor(max_workers=10) as exec:
+with ThreadPoolExecutor(max_workers=int(conf['offline']['threads'])) as exec:
     for level_of_detail in range(levels[0], levels[1]+1):
         nw_tiles = Tile.for_latitude_longitude(north_west[0], north_west[1], level_of_detail).google
         se_tiles = Tile.for_latitude_longitude(south_east[0], south_east[1], level_of_detail).google
