@@ -1,3 +1,6 @@
+import urllib3
+urllib3.disable_warnings()
+
 from flask import Flask, make_response
 import re
 import os
@@ -128,6 +131,36 @@ def tiles(path):
 
     return response
 
+
+@app.route('/')
+@app.route('/<path:dummy>')
+def fallback(dummy=None):
+    print(request.url)
+
+    disabled_links = [
+         #'tsom_cc_activation_masks',
+         'coverage_maps', 
+         'texture_synthesis_online_map_high_res',
+         'color_corrected_images'
+          ]
+
+    for disabled_link in disabled_links:
+        if disabled_link in request.url:
+            print("Skipped", request.url)
+            return make_response("", 404)
+
+    request_header = {}
+
+    for k,v in request.headers:
+        request_header[k] = v
+
+    remote_response = requests.get(
+        request.url, proxies=proxies, timeout=30, verify=False, headers = request_header )
+
+    response = make_response(remote_response.content)
+    for k,v in remote_response.headers.items():
+        response.headers[k]=v
+    return response
 
 if __name__ == "__main__":
     webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
