@@ -134,7 +134,7 @@ def tiles(path):
 @app.route('/')
 @app.route('/<path:dummy>')
 def fallback(dummy=None):
-    print(request.url)
+    print("Handing request to", request.url)
 
     disabled_links = [
          #'tsom_cc_activation_masks',
