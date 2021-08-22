@@ -14,6 +14,7 @@ import sys
 import webbrowser
 from diskcache import Cache
 import atexit
+import dns.resolver
 
 def run_as_admin():
     def is_admin():
@@ -35,6 +36,12 @@ def add_cert():
 
 my_hosts = Hosts()
 domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
+
+origin_ips = {}
+dns_resolver = dns.resolver.Resolver()
+dns_resolver.nameservers = ['8.8.8.8']
+for d in domains:    
+    origin_ips[d] = dns_resolver.query(d)[0].to_text()
 
 def override_hosts():
     print("Overriding hosts")
@@ -95,17 +102,9 @@ def quad_key_to_tileXY(quadKey):
     return tileX, tileY, levelOfDetail
 
 
-@app.route("/tiles/<path>")
+@app.route("/tiles/akh<path>")
 def tiles(path):
-    if "akh" not in path:
-        if proxies is None:
-            return make_response("", 404)
-            
-        content = requests.get(
-            request.url, proxies=proxies, timeout=30, verify=False).content
-        return content
-
-    quadkey = re.findall(r"akh(\d+).jpeg", path)[0]
+    quadkey = re.findall(r"(\d+).jpeg", path)[0]
     tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
 
     url = f"https://mt1.google.com/vt/lyrs=s&x={tileX}&y={tileY}&z={levelOfDetail}"
@@ -153,6 +152,12 @@ def fallback(dummy=None):
 
     for k,v in request.headers:
         request_header[k] = v
+
+    if request.host in origin_ips.keys():
+        request.url = request.url.replace(request.host, origin_ips[request.host])
+        
+
+    print("Downloading from:", request.url)
 
     remote_response = requests.get(
         request.url, proxies=proxies, timeout=30, verify=False, headers = request_header )
