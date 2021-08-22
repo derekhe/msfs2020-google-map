@@ -31,6 +31,7 @@ The software is totally open source and you can check every piece of code here: 
 * Modify the `url` in config.ini to the proxy that you can access Google (if you are not in China, please delete this line)
 * Run `server.exe` to start the server, keep the command line screen open
 * Start flight simulation
+* Make sure you have "BING DATA WORLD GRAPHICS.." and "PHOTOGRAMMETRY" turn ON in game, otherwise you will get offline map
 * Enjoy
 * If you want exit the game, please close the command line using `ctrl+c`
 
