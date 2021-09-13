@@ -15,6 +15,7 @@ import webbrowser
 from diskcache import Cache
 import atexit
 import dns.resolver
+from flask.wrappers import Response
 
 def run_as_admin():
     def is_admin():
@@ -130,44 +131,6 @@ def tiles(path):
 
     return response
 
-
-@app.route('/')
-@app.route('/<path:dummy>')
-def fallback(dummy=None):
-    print("Handing request to", request.url)
-
-    disabled_links = [
-         #'tsom_cc_activation_masks',
-         'coverage_maps', 
-         'texture_synthesis_online_map_high_res',
-         'color_corrected_images'
-          ]
-
-    for disabled_link in disabled_links:
-        if disabled_link in request.url:
-            print("Skipped", request.url)
-            return make_response("", 404)
-
-    request_header = {}
-
-    for k,v in request.headers:
-        request_header[k] = v
-
-    if request.host in origin_ips.keys():
-        request.url = request.url.replace(request.host, origin_ips[request.host])
-        
-
-    print("Downloading from:", request.url)
-
-    remote_response = requests.get(
-        request.url, proxies=proxies, timeout=30, verify=False, headers = request_header )
-
-    response = make_response(remote_response.content)
-    for k,v in remote_response.headers.items():
-        response.headers[k]=v
-    return response
-
 if __name__ == "__main__":
     webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
-    app.run(ssl_context=('certs/cert.pem', 'certs/key.pem'),
-            port=443, host="0.0.0.0", threaded=True)
+    app.run(port=8000, host="0.0.0.0", threaded=True)
