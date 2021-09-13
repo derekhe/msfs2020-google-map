@@ -1,91 +1,24 @@
+from flask.wrappers import Response
+import dns.resolver
+import atexit
+from diskcache import Cache
+import webbrowser
+import sys
+import ctypes
+from python_hosts import Hosts, HostsEntry
+from configparser import ConfigParser
+from flask import request
+import requests
+import subprocess
+import os
+import re
+from flask import Flask, make_response
 import urllib3
 urllib3.disable_warnings()
 
-from flask import Flask, make_response
-import re
-import os
-import subprocess
-import requests
-from flask import request
-from configparser import ConfigParser
-from python_hosts import Hosts, HostsEntry
-import ctypes
-import sys
-import webbrowser
-from diskcache import Cache
-import atexit
-import dns.resolver
-from flask.wrappers import Response
-
-def run_as_admin():
-    def is_admin():
-        try:
-            return ctypes.windll.shell32.IsUserAnAdmin()
-        except:
-            return False
-
-    if not is_admin():
-        ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, __file__, None, 1)
-
-
-def add_cert():
-    print("Adding certificate to root")
-    subprocess.run(["certutil", "-addstore", "-f", "root",
-                    ".\certs\cert.crt"], shell=True, check=True)
-    print("Successfully added certificate to root")
-
-my_hosts = Hosts()
-domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
-
-origin_ips = {}
-dns_resolver = dns.resolver.Resolver()
-dns_resolver.nameservers = ['8.8.8.8']
-for d in domains:    
-    origin_ips[d] = dns_resolver.query(d)[0].to_text()
-
-def override_hosts():
-    print("Overriding hosts")
-    for domain in domains:
-        my_hosts.remove_all_matching(name=domain)
-        new_entry = HostsEntry(
-            entry_type='ipv4', address='127.0.0.1', names=[domain])
-        my_hosts.add([new_entry])
-    my_hosts.write()
-    print("Done override hosts")
-
-def restore_hosts():
-    print("Restoring hosts")
-    for domain in domains:
-        my_hosts.remove_all_matching(name=domain)
-    my_hosts.write()
-
-atexit.register(restore_hosts)
-
-conf = ConfigParser()
-conf.read('config.ini')
-
-def config_proxy():
-    proxy_url = None
-    if conf['proxy']:
-        proxy_url = conf['proxy']['url']
-
-    if proxy_url is None:
-        proxy_url = os.getenv("http_proxy")
-
-    print("Proxy url is", proxy_url)
-
-    return {"https": proxy_url} if proxy_url is not None else None
-
-
-run_as_admin()
-add_cert()
-override_hosts()
-
-cache = Cache("./cache", size_limit=int(conf['offline']['max_cache_size_G'])*1024*1024*1024, shards=10)
-proxies = config_proxy()
+_cache = None
+_proxies = None
 app = Flask(__name__)
-
 
 def quad_key_to_tileXY(quadKey):
     tileX = tileY = 0
@@ -102,6 +35,9 @@ def quad_key_to_tileXY(quadKey):
             tileY |= mask
     return tileX, tileY, levelOfDetail
 
+@app.route("/health")
+def health():
+    return "alive"
 
 @app.route("/tiles/akh<path>")
 def tiles(path):
@@ -109,28 +45,32 @@ def tiles(path):
     tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
 
     url = f"https://mt1.google.com/vt/lyrs=s&x={tileX}&y={tileY}&z={levelOfDetail}"
-    
+
     cache_key = f"{levelOfDetail}{tileX}{tileY}"
-    content = cache.get(cache_key)
+    content = _cache.get(cache_key)
     if content is None:
         print("Downloading from:", url)
         content = requests.get(
-            url, proxies=proxies, timeout=30).content
+            url, proxies=_proxies, timeout=30).content
 
-        cache.set(cache_key, content)
+        _cache.set(cache_key, content)
     else:
         print("Use cached:", url)
 
     response = make_response(content)
     headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580", "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035", "X-VE-ID": "4862_136744347",
-               "X-VE-TILEMETA-CaptureDatesRang": "1/1/1999-12/31/2003",
-               "X-VE-TILEMETA-CaptureDateMaxYY": "0312",
-               "X-VE-TILEMETA-Product-IDs": "209"}
+                "X-VE-TILEMETA-CaptureDatesRang": "1/1/1999-12/31/2003",
+                "X-VE-TILEMETA-CaptureDateMaxYY": "0312",
+                "X-VE-TILEMETA-Product-IDs": "209"}
     for k, v in headers.items():
         response.headers[k] = v
 
     return response
 
-if __name__ == "__main__":
-    webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
+def run_server(cache_size, proxies):
+    global _cache, _proxies
+    _cache = Cache(
+        "./cache", size_limit=int(cache_size)*1024*1024*1024, shards=10)
+    _proxies = proxies
+
     app.run(port=8000, host="0.0.0.0", threaded=True)
