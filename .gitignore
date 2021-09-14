@@ -5,3 +5,4 @@ build/
 .vscode/
 nginx/logs/
 nginx/temp/
+.idea/

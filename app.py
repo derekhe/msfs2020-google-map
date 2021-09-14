@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -7,7 +8,7 @@ from configparser import ConfigParser
 import os
 import subprocess
 
-from runner import add_cert, override_hosts
+from runner import add_cert, override_hosts, restore_hosts
 from server import run_server
 from multiprocessing import Process
 
@@ -28,7 +29,8 @@ class MSFS2020:
                                textvariable=self.proxy_address)
         feet_entry.grid(column=2, row=2, sticky=(W, E))
 
-        ttk.Label(mainframe, text="Proxy format: http://ip or socks5h://ip\nleave blank if no proxy is needed to access google").grid(
+        ttk.Label(mainframe,
+                  text="Proxy format: http://ip or socks5h://ip\nleave blank if no proxy is needed to access google").grid(
             column=1, row=1, sticky=(W), columnspan=2)
         ttk.Label(mainframe, text="Proxy").grid(column=1, row=2, sticky=(W, E))
         ttk.Button(mainframe, text="Test Connection",
@@ -51,6 +53,9 @@ class MSFS2020:
                 message='Please run in Administrator mode, application will close')
             root.destory()
 
+        root.protocol("WM_DELETE_WINDOW", self.quit)
+
+        self.root = root
         self.conf = ConfigParser()
         self.conf.read('config.ini')
         self.proxy = self.read_proxy_setting()
@@ -69,7 +74,8 @@ class MSFS2020:
 
         return {"https": proxy_url} if proxy_url is not None else None
 
-    def is_admin(self):
+    @staticmethod
+    def is_admin():
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
@@ -93,6 +99,7 @@ class MSFS2020:
             messagebox.showerror(message='Connection failed, please check')
 
     def run(self):
+        self.save_setting()
         self.stop()
         try:
             add_cert()
@@ -119,10 +126,24 @@ class MSFS2020:
             self.server_process.kill()
 
         if self.nginx_process is not None:
-            self.nginx_process.kill()
-            subprocess.Popen("nginx.exe -s quit", shell=True, cwd="./nginx")
+            subprocess.run("nginx.exe -s quit", shell=True, check=True, cwd="./nginx")
+            self.nginx_process.wait(5)
+            self.nginx_process = None
 
         self.status.set("Stopped")
+
+    def save_setting(self):
+        with open('config.ini', 'w') as configfile:
+            self.conf.write(configfile)
+
+    def quit(self):
+        try:
+            self.save_setting()
+            self.stop()
+            restore_hosts()
+        finally:
+            self.root.destroy()
+
 
 if __name__ == '__main__':
     root = Tk()
