@@ -1,4 +1,4 @@
-# [English verison here](./README.EN.md)
+# [English version here](./README.EN.md)
 
 # 中文
 ## 免责声明
@@ -26,35 +26,16 @@
 注意：如果杀毒软件报错，请加入白名单，都是误报；如果报告证书错误，请直接同意，否则加载不出来。
 
 * 下载release压缩包并解压
-* 修改config.ini中的`url`到你能访问Google的代理(如果你能直接访问谷歌，则将这一行删除即可）
-* 运行`server.exe`启动服务器
+* 运行`run.bat`启动程序，设置好proxy并测试代理，确保代理正常使用。
 * 启动模拟飞行，保留命令行的黑窗口
 * 保证游戏中在线地图功能打开（BING DATA WORLD GRAPHICS和PHOTOGRAMMETRY），否则只能获得离线地图
 * 尽情享用吧
-* 如需关闭，请在命令行窗口中按`ctrl+c`，以使hosts文件恢复正常
 
 如果hosts文件需要手动恢复，请删除
 `C:\Windows\System32\drivers\etc\hosts`文件中的如下两行:
 ```
 127.0.0.1	kh.ssl.ak.tiles.virtualearth.net
 127.0.0.1	khstorelive.azureedge.net
-```
-
-## 离线下载
-
-为了解决实时加载的问题，可以利用msfs2020内置的离线加载，但不太好操作。
-所以制作了一个`offline-cache.exe`进行下载，可以将地图进行预加载，此后地图加载非常迅速。
-编辑`config.ini`文件中的以下片段。不建议使用太大范围并且过于精细的级数。
-
-```
-[offline]
-# 使用 https://www.google.com/maps 获取坐标点
-north_west = 46.357879198300516, 83.39287198273128
-south_east = 22.89205887817234, 123.91045032827455
-# 从多少级到多少级，最大18级
-range = 5, 12
-# 缓存最大多少G
-max_cache_size_G = 20
 ```
 
 ## 背景
