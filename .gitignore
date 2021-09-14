@@ -6,3 +6,4 @@ build/
 nginx/logs/
 nginx/temp/
 .idea/
+python/*
