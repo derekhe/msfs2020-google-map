@@ -28,6 +28,7 @@ Some virus app reports errors and when in game it promote for https certificate 
 The software is totally open source and you can check every piece of code here: https://github.com/derekhe/msfs2020-google-map
 
 * Download the package and unzip it
+* First time: install Python3 using default settings: https://www.python.org/ftp/python/3.9.7/python-3.9.7-amd64.exe
 * Run `run.bat` to start the app, change the proxy setting
 * Start flight simulation
 * Make sure you have "BING DATA WORLD GRAPHICS.." and "PHOTOGRAMMETRY" turn ON in game, otherwise you will get offline map

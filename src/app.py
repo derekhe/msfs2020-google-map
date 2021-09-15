@@ -11,6 +11,7 @@ import subprocess
 from runner import add_cert, override_hosts, restore_hosts
 from server import run_server
 from multiprocessing import Process
+import webbrowser
 
 
 class MSFS2020:
@@ -146,6 +147,7 @@ class MSFS2020:
 
 
 if __name__ == '__main__':
+    webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
     root = Tk()
     MSFS2020(root)
     root.mainloop()
