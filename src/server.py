@@ -43,7 +43,7 @@ def tiles(path):
     cache_key = f"{levelOfDetail}{tileX}{tileY}"
     content = _cache.get(cache_key)
     if content is None:
-        print("Downloading from:", url)
+        print("Downloading from:", url, _proxies)
         content = requests.get(
             url, proxies=_proxies, timeout=30).content
 

@@ -81,17 +81,19 @@ class MSFS2020:
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
             return False
+    
+    def get_proxy_settings(self):
+        proxy = self.proxy_address.get()
+        if proxy is None or len(proxy) == 0:
+            proxies = None
+        else:
+            proxies = {"https": proxy}
+        return proxies
 
     def test_proxy(self):
         try:
-            proxy = self.proxy_address.get()
-            if proxy is None or len(proxy) == 0:
-                proxies = None
-            else:
-                proxies = {"https": self.proxy_address.get()}
-
             response = requests.get(
-                "https://mt1.google.com/vt/lyrs=s&x=1&y=1&z=1", timeout=3, proxies=proxies)
+                "https://mt1.google.com/vt/lyrs=s&x=1&y=1&z=1", timeout=3, proxies=self.get_proxy_settings())
             if response.status_code == 200:
                 messagebox.showinfo(message='Proxy is good')
             else:
@@ -114,7 +116,7 @@ class MSFS2020:
 
         try:
             self.server_process = Process(
-                target=run_server, args=(self.cache_size, self.proxy))
+                target=run_server, args=(self.cache_size, self.get_proxy_settings()))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
@@ -134,6 +136,7 @@ class MSFS2020:
         self.status.set("Stopped")
 
     def save_setting(self):
+        self.conf['proxy']['url'] = self.proxy_address.get()
         with open('config.ini', 'w') as configfile:
             self.conf.write(configfile)
 
