@@ -1,3 +1,2 @@
-python/** binary
-nginx/** binary
-certs/** binary
+python filter=lfs diff=lfs merge=lfs -text
+nginx filter=lfs diff=lfs merge=lfs -text
