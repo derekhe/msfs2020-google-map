@@ -1,2 +1,2 @@
-python filter=lfs diff=lfs merge=lfs -text
 nginx filter=lfs diff=lfs merge=lfs -text
+python3 filter=lfs diff=lfs merge=lfs -text
