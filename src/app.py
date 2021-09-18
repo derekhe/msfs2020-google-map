@@ -129,7 +129,7 @@ class MSFS2020:
             self.server_process.kill()
 
         if self.nginx_process is not None:
-            subprocess.run("nginx.exe -s quit", shell=True, check=True, cwd="./nginx")
+            subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=True)
             self.nginx_process.wait(1)
             self.nginx_process = None
 
