@@ -46,6 +46,9 @@ class MSFS2020:
         ttk.Button(mainframe, text="Stop", command=self.stop
                    ).grid(column=3, row=3)
 
+        ttk.Button(mainframe, text="Clear cache", command=self.clear_cache
+                   ).grid(column=4, row=3)
+
         for child in mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
 
@@ -81,7 +84,7 @@ class MSFS2020:
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
             return False
-    
+
     def get_proxy_settings(self):
         proxy = self.proxy_address.get()
         if proxy is None or len(proxy) == 0:
@@ -134,6 +137,11 @@ class MSFS2020:
             self.nginx_process = None
 
         self.status.set("Stopped")
+
+    @staticmethod
+    def clear_cache():
+        requests.delete("http://localhost:8000/cache", timeout=15)
+        messagebox.showinfo("Cache cleared")
 
     def save_setting(self):
         self.conf['proxy']['url'] = self.proxy_address.get()

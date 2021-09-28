@@ -3,7 +3,7 @@ import re
 import requests
 import urllib3
 from diskcache import Cache
-from flask import Flask, make_response
+from flask import Flask, make_response, Response
 
 urllib3.disable_warnings()
 
@@ -33,6 +33,11 @@ def health():
     return "alive"
 
 
+@app.route("/cache", methods=["DELETE"])
+def clear_cache():
+    _cache.clear()
+    return Response(status=200)
+
 @app.route("/tiles/akh<path>")
 def tiles(path):
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
@@ -52,7 +57,8 @@ def tiles(path):
         print("Use cached:", url)
 
     response = make_response(content)
-    headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580", "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035",
+    headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580",
+               "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035",
                "X-VE-ID": "4862_136744347",
                "X-VE-TILEMETA-CaptureDatesRang": "1/1/1999-12/31/2003",
                "X-VE-TILEMETA-CaptureDateMaxYY": "0312",
