@@ -83,7 +83,6 @@ https://github.com/muumimorko/MSFS2020_CGLTools/issues/2#issuecomment-762232597)
 # Sponsor
 
 If you have successfully achieved it, please give a star and let more people see it!
-If you are willing to give some sponsorship to the author, please scan the following QR code to support the author.
+If you are willing to give some sponsorship to the author, please register a digitalocean account by click the link below :)
 
-![WeChat](./doc/mm_reward_qrcode_1628320842310.png)
-![Ali](./doc/1628320893.jpg)
+<a href="https://www.digitalocean.com/?refcode=bf7e96b627b0&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://web-platforms.sfo2.cdn.digitaloceanspaces.com/WWW/Badge%201.svg" alt="DigitalOcean Referral Badge" /></a>
