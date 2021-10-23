@@ -1,20 +1,23 @@
+import time
+
 import ctypes
-import os
 import requests
 import subprocess
 import traceback
 import webbrowser
-from configparser import ConfigParser
 from multiprocessing import Process
 from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips
 from server import run_server
+from settings import Settings
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 
 
-class MSFS2020:
+class MainWindow:
     def __init__(self, root):
+        self.settings = Settings()
+
         root.title("MSFS 2020 Google Map")
 
         mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -23,29 +26,53 @@ class MSFS2020:
         root.columnconfigure(0, weight=1)
         root.rowconfigure(0, weight=1)
 
-        self.proxy_address = StringVar()
-        feet_entry = ttk.Entry(mainframe, width=20,
-                               textvariable=self.proxy_address)
-        feet_entry.grid(column=2, row=2, sticky=(W, E))
-
+        row = 1
         ttk.Label(mainframe,
-                  text="Proxy format: http://ip or socks5h://ip\nleave blank if no proxy is needed to access google").grid(
-            column=1, row=1, sticky=(W), columnspan=2)
-        ttk.Label(mainframe, text="Proxy").grid(column=1, row=2, sticky=(W, E))
-        ttk.Button(mainframe, text="Test Connection",
-                   command=self.test_proxy).grid(column=3, row=2, sticky=W)
+                  text="Proxy format: http://ip:port or socks5h://ip:port"
+                       "\nExample: http://192.168.10.1:8080 or socks5h://192.168.10.10:1080"
+                       "\nNote: leave blank if you don't need proxy to access google").grid(
+            column=1, row=row, sticky=W, columnspan=3)
 
-        self.status = StringVar(value="Not running")
-        ttk.Label(mainframe, textvariable=self.status).grid(column=1, row=3)
+        row += 1
+        self.proxy_address = StringVar()
+        proxy_address_entry = ttk.Entry(mainframe, width=30,
+                                        textvariable=self.proxy_address)
+        self.proxy_address.trace_add("write", self.proxy_address_updated)
+        proxy_address_entry.grid(column=2, row=row, sticky=(W, E))
+        self.proxy_address.set(self.settings.proxy_url)
+
+        ttk.Label(mainframe, text="Proxy").grid(column=1, row=row, )
+        ttk.Button(mainframe, text="Test Connection",
+                   command=self.test_proxy).grid(column=3, row=row, )
+
+        row += 1
+        ttk.Label(mainframe, text="Try another server if loading speed is slow, you must stop and then run again").grid(
+            column=1, row=row, columnspan=3,
+            sticky=W)
+
+        row += 1
+        ttk.Label(mainframe, text="Google server").grid(column=1, row=row, )
+
+        self.selected_google_server = StringVar()
+        google_server_combo = ttk.Combobox(mainframe, textvariable=self.selected_google_server)
+        google_server_combo['values'] = self.settings.google_servers
+        google_server_combo['state'] = 'readonly'
+        google_server_combo.grid(column=2, row=row, )
+        google_server_combo.bind('<<ComboboxSelected>>', self.google_server_selected)
+        self.selected_google_server.set(self.settings.google_server)
+
+        row += 1
+        self.status = StringVar(value="Stopped")
+        ttk.Label(mainframe, textvariable=self.status).grid(column=1, row=row)
 
         ttk.Button(mainframe, text="Run", command=self.run
-                   ).grid(column=2, row=3)
+                   ).grid(column=2, row=row)
 
         ttk.Button(mainframe, text="Stop", command=self.stop
-                   ).grid(column=3, row=3)
+                   ).grid(column=3, row=row)
 
         ttk.Button(mainframe, text="Clear cache", command=self.clear_cache
-                   ).grid(column=4, row=3)
+                   ).grid(column=4, row=row)
 
         for child in mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -58,23 +85,8 @@ class MSFS2020:
         root.protocol("WM_DELETE_WINDOW", self.quit)
 
         self.root = root
-        self.conf = ConfigParser()
-        self.conf.read('config.ini')
-        self.proxy = self.read_proxy_setting()
-        self.cache_size = self.conf['offline']['max_cache_size_G']
         self.server_process = None
         self.nginx_process = None
-
-    def read_proxy_setting(self):
-        proxy_url = None
-        if self.conf['proxy']:
-            proxy_url = self.conf['proxy']['url']
-            self.proxy_address.set(proxy_url)
-
-        if proxy_url is None:
-            proxy_url = os.getenv("http_proxy")
-
-        return {"https": proxy_url} if proxy_url is not None else None
 
     @staticmethod
     def is_admin():
@@ -83,20 +95,21 @@ class MSFS2020:
         except:
             return False
 
-    def get_proxy_settings(self):
-        proxy = self.proxy_address.get()
-        if proxy is None or len(proxy) == 0:
-            proxies = None
-        else:
-            proxies = {"https": proxy}
-        return proxies
+    def proxy_address_updated(self, *args):
+        self.settings.proxy_url = self.proxy_address.get()
+
+    def google_server_selected(self, event):
+        self.settings.google_server = self.selected_google_server.get()
 
     def test_proxy(self):
         try:
+            begin = time.time()
             response = requests.get(
-                "https://mt1.google.com/vt/lyrs=s&x=1&y=1&z=1", timeout=3, proxies=self.get_proxy_settings())
+                f"https://{self.selected_google_server.get()}/vt/lyrs=s&x=1&y=1&z=1", timeout=3,
+                proxies={"https": self.settings.proxy_url})
+            duration = time.time() - begin
             if response.status_code == 200:
-                messagebox.showinfo(message='Proxy is good')
+                messagebox.showinfo(message=f'Proxy is good, response time is {duration:0.2}s')
             else:
                 messagebox.showerror(message='Connection failed, please check')
         except:
@@ -125,7 +138,7 @@ class MSFS2020:
         return template
 
     def run(self):
-        self.save_setting()
+        self.settings.save()
         self.stop()
         try:
             add_cert()
@@ -151,7 +164,7 @@ class MSFS2020:
 
         try:
             self.server_process = Process(
-                target=run_server, args=(self.cache_size, self.get_proxy_settings()))
+                target=run_server, args=(self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
@@ -172,17 +185,12 @@ class MSFS2020:
 
     @staticmethod
     def clear_cache():
-        requests.delete("http://localhost:8000/cache", timeout=15)
-        messagebox.showinfo("Cache cleared")
-
-    def save_setting(self):
-        self.conf['proxy']['url'] = self.proxy_address.get()
-        with open('config.ini', 'w') as configfile:
-            self.conf.write(configfile)
+        if requests.delete("http://localhost:8000/cache", timeout=15).status_code == 200:
+            messagebox.showinfo("Cache cleared")
 
     def quit(self):
         try:
-            self.save_setting()
+            self.settings.save()
             self.stop()
             restore_hosts()
         finally:
@@ -192,5 +200,5 @@ class MSFS2020:
 if __name__ == '__main__':
     webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
     root = Tk()
-    MSFS2020(root)
+    MainWindow(root)
     root.mainloop()

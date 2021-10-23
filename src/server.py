@@ -7,25 +7,26 @@ from flask import Flask, make_response, Response
 
 urllib3.disable_warnings()
 
-_cache: Cache = None
-_proxies = None
+__cache: Cache = None
+__proxies = None
+__google_server = "mt1.google.com"
 app = Flask(__name__)
 
 
-def quad_key_to_tileXY(quadKey):
-    tileX = tileY = 0
-    levelOfDetail = len(quadKey)
-    for i in range(levelOfDetail, 0, -1):
+def quad_key_to_tile_xy(quad_key):
+    tile_x = tile_y = 0
+    level_of_detail = len(quad_key)
+    for i in range(level_of_detail, 0, -1):
         mask = 1 << (i - 1)
-        t = quadKey[levelOfDetail - i]
+        t = quad_key[level_of_detail - i]
         if t == '1':
-            tileX |= mask
+            tile_x |= mask
         if t == '2':
-            tileY |= mask
+            tile_y |= mask
         if t == '3':
-            tileX |= mask
-            tileY |= mask
-    return tileX, tileY, levelOfDetail
+            tile_x |= mask
+            tile_y |= mask
+    return tile_x, tile_y, level_of_detail
 
 
 @app.route("/health")
@@ -35,25 +36,25 @@ def health():
 
 @app.route("/cache", methods=["DELETE"])
 def clear_cache():
-    _cache.clear()
+    __cache.clear()
     return Response(status=200)
 
 
 @app.route("/tiles/akh<path>")
 def tiles(path):
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
-    tileX, tileY, levelOfDetail = quad_key_to_tileXY(quadkey)
+    tile_x, tile_y, level_of_detail = quad_key_to_tile_xy(quadkey)
 
-    url = f"https://mt1.google.com/vt/lyrs=s&x={tileX}&y={tileY}&z={levelOfDetail}"
+    url = f"https://{__google_server}/vt/lyrs=s&x={tile_x}&y={tile_y}&z={level_of_detail}"
 
-    cache_key = f"{levelOfDetail}{tileX}{tileY}"
-    content = _cache.get(cache_key)
+    cache_key = f"{level_of_detail}{tile_x}{tile_y}"
+    content = __cache.get(cache_key)
     if content is None:
-        print("Downloading from:", url, _proxies)
+        print("Downloading from:", url, __proxies)
         content = requests.get(
-            url, proxies=_proxies, timeout=30).content
+            url, proxies=__proxies, timeout=30).content
 
-        _cache.set(cache_key, content)
+        __cache.set(cache_key, content)
     else:
         print("Use cached:", url)
 
@@ -70,10 +71,11 @@ def tiles(path):
     return response
 
 
-def run_server(cache_size, proxies):
-    global _cache, _proxies
-    _cache = Cache(
+def run_server(cache_size, proxies, google_server):
+    global __cache, __proxies, __google_server
+    __cache = Cache(
         "./cache", size_limit=int(cache_size) * 1024 * 1024 * 1024, shards=10)
-    _proxies = proxies
+    __proxies = {"https": proxies}
+    __google_server = google_server
 
     app.run(port=8000, host="0.0.0.0", threaded=True)
