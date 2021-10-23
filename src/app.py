@@ -7,7 +7,7 @@ import traceback
 import webbrowser
 from multiprocessing import Process
 from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips
-from server import run_server
+from server import run_server, clear_cache
 from settings import Settings
 from tkinter import *
 from tkinter import messagebox
@@ -185,8 +185,8 @@ class MainWindow:
 
     @staticmethod
     def clear_cache():
-        if requests.delete("http://localhost:8000/cache", timeout=15).status_code == 200:
-            messagebox.showinfo("Cache cleared")
+        clear_cache()
+        messagebox.showinfo("Cache cleared")
 
     def quit(self):
         try:

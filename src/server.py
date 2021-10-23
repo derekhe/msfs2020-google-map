@@ -1,7 +1,12 @@
+import math
+
+import io
 import re
 
 import requests
+import traceback
 import urllib3
+from PIL import Image, ImageEnhance, ImageStat
 from diskcache import Cache
 from flask import Flask, make_response, Response
 
@@ -40,6 +45,11 @@ def clear_cache():
     return Response(status=200)
 
 
+def calc_brightness(im):
+    stat = ImageStat.Stat(im.convert('L'))
+    return stat.rms[0]
+
+
 @app.route("/tiles/akh<path>")
 def tiles(path):
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
@@ -51,14 +61,36 @@ def tiles(path):
     content = __cache.get(cache_key)
     if content is None:
         print("Downloading from:", url, __proxies)
-        content = requests.get(
-            url, proxies=__proxies, timeout=30).content
+        resp = requests.get(
+            url, proxies=__proxies, timeout=30)
 
+        if resp.status_code != 200:
+            return Response(status=404)
+
+        content = resp.content
         __cache.set(cache_key, content)
     else:
         print("Use cached:", url)
 
-    response = make_response(content)
+    try:
+        im = Image.open(io.BytesIO(content))
+        brightness = calc_brightness(im) / 255
+
+        factor = - 2 * math.pow(brightness, 2) + 2 * math.pow(brightness, 3) + 1
+
+        print(url, brightness, factor)
+
+        enhancer = ImageEnhance.Brightness(im)
+        im = enhancer.enhance(factor)
+        img_byte_arr = io.BytesIO()
+        im.save(img_byte_arr, format='jpeg')
+        output = img_byte_arr.getvalue()
+    except:
+        print("Image adjust failed, use original picture")
+        output = content
+        traceback.print_exc()
+
+    response = make_response(output)
     headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580",
                "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035",
                "X-VE-ID": "4862_136744347",
@@ -69,6 +101,10 @@ def tiles(path):
         response.headers[k] = v
 
     return response
+
+
+def clear_cache():
+    Cache("./cache").clear()
 
 
 def run_server(cache_size, proxies, google_server):
