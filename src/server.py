@@ -1,4 +1,6 @@
+import io
 import re
+from PIL import Image
 
 import requests
 import urllib3
@@ -46,19 +48,32 @@ def tiles(path):
     tile_x, tile_y, level_of_detail = quad_key_to_tile_xy(quadkey)
 
     url = f"https://{__google_server}/vt/lyrs=s&x={tile_x}&y={tile_y}&z={level_of_detail}"
+    print(url)
 
-    cache_key = f"{level_of_detail}{tile_x}{tile_y}"
-    content = __cache.get(cache_key)
-    if content is None:
-        print("Downloading from:", url, __proxies)
+    next_zoom_level = level_of_detail + 1
+    url1 = f"https://{__google_server}/vt/lyrs=s&x={tile_x * 2}&y={tile_y * 2}&z={next_zoom_level}"
+    url2 = f"https://{__google_server}/vt/lyrs=s&x={tile_x * 2 + 1}&y={tile_y * 2}&z={next_zoom_level}"
+    url3 = f"https://{__google_server}/vt/lyrs=s&x={tile_x * 2}&y={tile_y * 2 + 1}&z={next_zoom_level}"
+    url4 = f"https://{__google_server}/vt/lyrs=s&x={tile_x * 2 + 1}&y={tile_y * 2 + 1}&z={next_zoom_level}"
+
+    images = []
+    for url in [url1, url2, url3, url4]:
+        print(url)
         content = requests.get(
             url, proxies=__proxies, timeout=30).content
+        images.append(Image.open(io.BytesIO(content)))
 
-        __cache.set(cache_key, content)
-    else:
-        print("Use cached:", url)
+    output = Image.new('RGB', (256 * 2, 256 * 2))
+    output.paste(images[0], (0, 0))
+    output.paste(images[1], (256, 0))
+    output.paste(images[2], (0, 256))
+    output.paste(images[3], (256, 256))
 
-    response = make_response(content)
+    img_byte_arr = io.BytesIO()
+    output.save(img_byte_arr, format='jpeg')
+    img_byte_arr = img_byte_arr.getvalue()
+
+    response = make_response(img_byte_arr)
     headers = {"Content-Type": "image/jpeg", "Last-Modified": "Sat, 24 Oct 2020 06:48:56 GMT", "ETag": "9580",
                "Server": "Microsoft-IIS/10.0", "X-VE-TFE": "BN00004E85", "X-VE-AZTBE": "BN000033DA", "X-VE-AC": "5035",
                "X-VE-ID": "4862_136744347",
