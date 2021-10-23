@@ -1,21 +1,19 @@
-import time
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
 import ctypes
-import requests
-from configparser import ConfigParser
 import os
+import requests
 import subprocess
-
-from runner import add_cert, override_hosts, restore_hosts
-from server import run_server
-from multiprocessing import Process
+import traceback
 import webbrowser
+from configparser import ConfigParser
+from multiprocessing import Process
+from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips
+from server import run_server
+from tkinter import *
+from tkinter import messagebox
+from tkinter import ttk
 
 
 class MSFS2020:
-
     def __init__(self, root):
         root.title("MSFS 2020 Google Map")
 
@@ -104,6 +102,28 @@ class MSFS2020:
         except:
             messagebox.showerror(message='Connection failed, please check')
 
+    @staticmethod
+    def enable_features(template: str):
+        features_disabled = {
+            "tsom_cc_activation_masks": True,
+            "coverage_maps": True,
+            "texture_synthesis_online_map_high_res": True,
+            "color_corrected_images": True,
+            "bing_aerial": True
+        }
+
+        out = template
+        for feature in features_disabled:
+            if features_disabled[feature]:
+                out = out.replace(f"#{feature}#", "")
+        return out
+
+    @staticmethod
+    def config_dns(template: str):
+        for k, v in get_hosts_origin_ips().items():
+            template = template.replace(f"#{k}#", v)
+        return template
+
     def run(self):
         self.save_setting()
         self.stop()
@@ -111,6 +131,18 @@ class MSFS2020:
             add_cert()
         except:
             messagebox.showerror(message="Add certificate failed")
+
+        try:
+            with open("./src/nginx.conf.template", "rt") as nginx:
+                template = nginx.read()
+                output = self.enable_features(template)
+                output = self.config_dns(output)
+
+            with open("./nginx/conf/nginx.conf", "wt") as out:
+                out.write(output)
+        except:
+            traceback.print_exc()
+            messagebox.showerror(message="Generate nginx file failed")
 
         try:
             override_hosts()

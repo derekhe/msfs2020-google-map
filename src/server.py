@@ -38,6 +38,7 @@ def clear_cache():
     _cache.clear()
     return Response(status=200)
 
+
 @app.route("/tiles/akh<path>")
 def tiles(path):
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
