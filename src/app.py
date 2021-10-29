@@ -1,5 +1,5 @@
 import time
-
+import socket
 import ctypes
 import requests
 import subprocess
@@ -77,12 +77,17 @@ class MainWindow:
         for child in mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
 
+        root.protocol("WM_DELETE_WINDOW", self.quit)
+
         if not self.is_admin():
             messagebox.showerror(
                 message='Please run in Administrator mode, application will close')
-            root.destory()
+            exit(-1)
 
-        root.protocol("WM_DELETE_WINDOW", self.quit)
+        if self.is_443_occupied():
+            messagebox.showerror(
+                message='You have application using 443 port, please close them, application will close')
+            exit(-1)
 
         self.root = root
         self.server_process = None
@@ -164,7 +169,8 @@ class MainWindow:
 
         try:
             self.server_process = Process(
-                target=run_server, args=(self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
+                target=run_server,
+                args=(self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
@@ -195,6 +201,12 @@ class MainWindow:
             restore_hosts()
         finally:
             self.root.destroy()
+
+    @staticmethod
+    def is_443_occupied():
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            result = sock.connect_ex(('127.0.0.1', 443))
+            return result == 0
 
 
 if __name__ == '__main__':
