@@ -1,9 +1,10 @@
+import concurrent.futures
 import io
 import re
-from PIL import Image
-
 import requests
 import urllib3
+from PIL import Image
+from concurrent.futures.thread import ThreadPoolExecutor
 from diskcache import Cache
 from flask import Flask, make_response, Response
 
@@ -42,6 +43,19 @@ def clear_cache():
     return Response(status=200)
 
 
+def download_image(url):
+    print("Downloading", url)
+    cached = __cache.get(url)
+
+    if cached is not None:
+        content = cached
+    else:
+        content = requests.get(url, proxies=__proxies, timeout=30).content
+        __cache.set(url, content)
+
+    return content
+
+
 @app.route("/tiles/akh<path>")
 def tiles(path):
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
@@ -56,18 +70,22 @@ def tiles(path):
     url3 = f"https://{__google_server}/vt/lyrs=s&x={tile_x * 2}&y={tile_y * 2 + 1}&z={next_zoom_level}"
     url4 = f"https://{__google_server}/vt/lyrs=s&x={tile_x * 2 + 1}&y={tile_y * 2 + 1}&z={next_zoom_level}"
 
-    images = []
-    for url in [url1, url2, url3, url4]:
-        print(url)
-        content = requests.get(
-            url, proxies=__proxies, timeout=30).content
-        images.append(Image.open(io.BytesIO(content)))
+    images = {}
+    with ThreadPoolExecutor() as executor:
+        future_to_url = {executor.submit(download_image, url): url for url in [url1, url2, url3, url4]}
+
+        for future in concurrent.futures.as_completed(future_to_url):
+            url = future_to_url[future]
+            try:
+                images[url] = Image.open(io.BytesIO(future.result()))
+            except Exception as exc:
+                print('%r generated an exception: %s' % (url, exc))
 
     output = Image.new('RGB', (256 * 2, 256 * 2))
-    output.paste(images[0], (0, 0))
-    output.paste(images[1], (256, 0))
-    output.paste(images[2], (0, 256))
-    output.paste(images[3], (256, 256))
+    output.paste(images[url1], (0, 0))
+    output.paste(images[url2], (256, 0))
+    output.paste(images[url3], (0, 256))
+    output.paste(images[url4], (256, 256))
 
     img_byte_arr = io.BytesIO()
     output.save(img_byte_arr, format='jpeg')
