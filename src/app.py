@@ -20,59 +20,30 @@ class MainWindow:
 
         root.title("MSFS 2020 Google Map")
 
-        mainframe = ttk.Frame(root, padding="3 3 12 12")
+        mainframe = ttk.Frame(root)
         mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 
-        root.columnconfigure(0, weight=1)
-        root.rowconfigure(0, weight=1)
-
         row = 1
-        ttk.Label(mainframe,
-                  text="Proxy format: http://ip:port or socks5h://ip:port"
-                       "\nExample: http://192.168.10.1:8080 or socks5h://192.168.10.10:1080"
-                       "\nNote: leave blank if you don't need proxy to access google").grid(
-            column=1, row=row, sticky=W, columnspan=3)
+        self.setting_tabs = ttk.Notebook(mainframe)
+        self.setting_tabs.grid(column=1, row=row, columnspan=3)
 
-        row += 1
-        self.proxy_address = StringVar()
-        proxy_address_entry = ttk.Entry(mainframe, width=30,
-                                        textvariable=self.proxy_address)
-        self.proxy_address.trace_add("write", self.proxy_address_updated)
-        proxy_address_entry.grid(column=2, row=row, sticky=(W, E))
-        self.proxy_address.set(self.settings.proxy_url)
+        proxy_settings = ttk.Frame(self.setting_tabs, padding=10)
+        self.create_proxy_settings(proxy_settings)
+        self.setting_tabs.add(proxy_settings, text='Proxy')
 
-        ttk.Label(mainframe, text="Proxy").grid(column=1, row=row, )
-        ttk.Button(mainframe, text="Test Connection",
-                   command=self.test_proxy).grid(column=3, row=row, )
+        google_map_server_settings = ttk.Frame(self.setting_tabs, padding=10)
+        self.create_google_map_settings(google_map_server_settings)
+        self.setting_tabs.add(google_map_server_settings, text='Map Server')
 
-        row += 1
-        ttk.Label(mainframe, text="Try another server if loading speed is slow, you must stop and then run again").grid(
-            column=1, row=row, columnspan=3,
-            sticky=W)
-
-        row += 1
-        ttk.Label(mainframe, text="Google server").grid(column=1, row=row, )
-
-        self.selected_google_server = StringVar()
-        google_server_combo = ttk.Combobox(mainframe, textvariable=self.selected_google_server)
-        google_server_combo['values'] = self.settings.google_servers
-        google_server_combo['state'] = 'readonly'
-        google_server_combo.grid(column=2, row=row, )
-        google_server_combo.bind('<<ComboboxSelected>>', self.google_server_selected)
-        self.selected_google_server.set(self.settings.google_server)
+        cache_settings = ttk.Frame(self.setting_tabs, padding=10)
+        self.create_cache_settings(cache_settings)
+        self.setting_tabs.add(cache_settings, text="Cache")
 
         row += 1
         self.status = StringVar(value="Stopped")
         ttk.Label(mainframe, textvariable=self.status).grid(column=1, row=row)
-
-        ttk.Button(mainframe, text="Run", command=self.run
-                   ).grid(column=2, row=row)
-
-        ttk.Button(mainframe, text="Stop", command=self.stop
-                   ).grid(column=3, row=row)
-
-        ttk.Button(mainframe, text="Clear cache", command=self.clear_cache
-                   ).grid(column=4, row=row)
+        ttk.Button(mainframe, text="Run", command=self.run).grid(column=2, row=row)
+        ttk.Button(mainframe, text="Stop", command=self.stop).grid(column=3, row=row)
 
         for child in mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -92,6 +63,48 @@ class MainWindow:
         self.root = root
         self.server_process = None
         self.nginx_process = None
+
+    def create_proxy_settings(self, parent):
+        row = 1
+        ttk.Label(parent,
+                  text="Proxy format: http://ip:port or socks5h://ip:port"
+                       "\nExample: http://192.168.10.1:8080 or socks5h://192.168.10.10:1080"
+                       "\nNote: leave blank if you don't need proxy to access google").grid(
+            column=1, row=row, sticky=W, columnspan=3)
+
+        row += 1
+        self.proxy_address = StringVar()
+        proxy_address_entry = ttk.Entry(parent, width=30,
+                                        textvariable=self.proxy_address)
+        self.proxy_address.trace_add("write", self.proxy_address_updated)
+        proxy_address_entry.grid(column=2, row=row, sticky=(W, E))
+        self.proxy_address.set(self.settings.proxy_url)
+
+        ttk.Label(parent, text="Proxy").grid(column=1, row=row, )
+        ttk.Button(parent, text="Test Connection",
+                   command=self.test_proxy).grid(column=3, row=row, )
+
+        row += 1
+        ttk.Label(parent, text="Try another server if loading speed is slow, you must stop and then run again").grid(
+            column=1, row=row, columnspan=3,
+            sticky=W)
+
+    def create_google_map_settings(self, parent):
+        row = 1
+        ttk.Label(parent, text="Google server").grid(column=1, row=row, )
+
+        self.selected_google_server = StringVar()
+        google_server_combo = ttk.Combobox(parent, textvariable=self.selected_google_server)
+        google_server_combo['values'] = self.settings.google_servers
+        google_server_combo['state'] = 'readonly'
+        google_server_combo.grid(column=2, row=row, )
+        google_server_combo.bind('<<ComboboxSelected>>', self.google_server_selected)
+        self.selected_google_server.set(self.settings.google_server)
+
+    def create_cache_settings(self, parent):
+        row = 1
+        ttk.Button(parent, text="Clear cache", command=self.clear_cache
+                   ).grid(column=4, row=row)
 
     @staticmethod
     def is_admin():
@@ -191,8 +204,11 @@ class MainWindow:
 
     @staticmethod
     def clear_cache():
-        clear_cache()
-        messagebox.showinfo("Cache cleared")
+        try:
+            clear_cache()
+            messagebox.showinfo(message="Cache cleared")
+        except:
+            messagebox.showinfo(message="Cache clean failed")
 
     def quit(self):
         try:
@@ -210,7 +226,7 @@ class MainWindow:
 
 
 if __name__ == '__main__':
-    webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
+    # webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
     root = Tk()
     MainWindow(root)
     root.mainloop()
