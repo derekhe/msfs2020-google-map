@@ -103,10 +103,6 @@ def tiles(path):
     return response
 
 
-def clear_cache():
-    Cache("./cache").clear()
-
-
 def run_server(cache_size, proxies, google_server):
     global __cache, __proxies, __google_server
     __cache = Cache(

@@ -5,6 +5,7 @@ import requests
 import subprocess
 import traceback
 import webbrowser
+from diskcache import Cache
 from multiprocessing import Process
 from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips
 from server import run_server, clear_cache
@@ -19,13 +20,20 @@ class MainWindow:
         self.settings = Settings()
 
         root.title("MSFS 2020 Google Map")
+        root.resizable(False, False)
 
         mainframe = ttk.Frame(root)
-        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        mainframe.grid(column=0, row=0, )
 
-        row = 1
+        row = 0
+
+        row += 1
         self.setting_tabs = ttk.Notebook(mainframe)
         self.setting_tabs.grid(column=1, row=row, columnspan=3)
+
+        help = ttk.Frame(self.setting_tabs, padding=10)
+        self.create_help(help)
+        self.setting_tabs.add(help, text="Help")
 
         proxy_settings = ttk.Frame(self.setting_tabs, padding=10)
         self.create_proxy_settings(proxy_settings)
@@ -44,6 +52,11 @@ class MainWindow:
         ttk.Label(mainframe, textvariable=self.status).grid(column=1, row=row)
         ttk.Button(mainframe, text="Run", command=self.run).grid(column=2, row=row)
         ttk.Button(mainframe, text="Stop", command=self.stop).grid(column=3, row=row)
+
+        row += 1
+        ttk.Label(mainframe, text="If you like this mod, please help me improve it by donate").grid(column=1, row=row,
+                                                                                                    columnspan=2)
+        ttk.Button(mainframe, text="Donate", command=self.donate).grid(column=3, row=row)
 
         for child in mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -205,7 +218,7 @@ class MainWindow:
     @staticmethod
     def clear_cache():
         try:
-            clear_cache()
+            Cache("./cache").clear()
             messagebox.showinfo(message="Cache cleared")
         except:
             messagebox.showinfo(message="Cache clean failed")
@@ -218,15 +231,42 @@ class MainWindow:
         finally:
             self.root.destroy()
 
+    def donate(self):
+        webbrowser.open("https://www.paypal.com/paypalme/siconghe?country.x=C2&locale.x=en_US")
+
     @staticmethod
     def is_443_occupied():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             result = sock.connect_ex(('127.0.0.1', 443))
             return result == 0
 
+    def create_help(self, parent):
+        row = 1
+        ttk.Label(parent, text="Please always check latest version").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open Latest release page",
+                   command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")).grid(
+            column=2, row=row, sticky=(W, E))
+
+        row += 1
+        ttk.Label(parent, text="First time intro").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open Introduction and Usage page",
+                   command=lambda: webbrowser.open("https://www.youtube.com/watch?v=Lk7GK5XLTt8")).grid(column=2,
+                                                                                                        row=row,
+                                                                                                        sticky=(W, E))
+
+        row += 1
+        ttk.Label(parent, text="Discussion").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open FlightSim.to homepage",
+                   command=lambda: webbrowser.open(
+                       "https://zh.flightsim.to/file/19345/msfs-2020-google-map-replacement")).grid(
+            column=2,
+            row=row, sticky=(W, E))
+
+        for child in parent.winfo_children():
+            child.grid_configure(padx=5, pady=5)
+
 
 if __name__ == '__main__':
-    # webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")
     root = Tk()
     MainWindow(root)
     root.mainloop()
