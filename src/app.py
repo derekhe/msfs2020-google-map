@@ -120,6 +120,31 @@ class MainWindow:
         ttk.Button(parent, text="Clear cache", command=self.clear_cache
                    ).grid(column=4, row=row)
 
+    def create_help(self, parent):
+        row = 1
+        ttk.Label(parent, text="Please always check latest version").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open Latest release page",
+                   command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")).grid(
+            column=2, row=row, sticky=(W, E))
+
+        row += 1
+        ttk.Label(parent, text="First time intro").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open Introduction and Usage page",
+                   command=lambda: webbrowser.open("https://www.youtube.com/watch?v=Lk7GK5XLTt8")).grid(column=2,
+                                                                                                        row=row,
+                                                                                                        sticky=(W, E))
+
+        row += 1
+        ttk.Label(parent, text="Discussion").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open FlightSim.to homepage",
+                   command=lambda: webbrowser.open(
+                       "https://zh.flightsim.to/file/19345/msfs-2020-google-map-replacement")).grid(
+            column=2,
+            row=row, sticky=(W, E))
+
+        for child in parent.winfo_children():
+            child.grid_configure(padx=5, pady=5)
+
     @staticmethod
     def is_admin():
         try:
@@ -240,31 +265,6 @@ class MainWindow:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             result = sock.connect_ex(('127.0.0.1', 443))
             return result == 0
-
-    def create_help(self, parent):
-        row = 1
-        ttk.Label(parent, text="Please always check latest version").grid(column=1, row=row, sticky=(W, E))
-        ttk.Button(parent, text="Open Latest release page",
-                   command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")).grid(
-            column=2, row=row, sticky=(W, E))
-
-        row += 1
-        ttk.Label(parent, text="First time intro").grid(column=1, row=row, sticky=(W, E))
-        ttk.Button(parent, text="Open Introduction and Usage page",
-                   command=lambda: webbrowser.open("https://www.youtube.com/watch?v=Lk7GK5XLTt8")).grid(column=2,
-                                                                                                        row=row,
-                                                                                                        sticky=(W, E))
-
-        row += 1
-        ttk.Label(parent, text="Discussion").grid(column=1, row=row, sticky=(W, E))
-        ttk.Button(parent, text="Open FlightSim.to homepage",
-                   command=lambda: webbrowser.open(
-                       "https://zh.flightsim.to/file/19345/msfs-2020-google-map-replacement")).grid(
-            column=2,
-            row=row, sticky=(W, E))
-
-        for child in parent.winfo_children():
-            child.grid_configure(padx=5, pady=5)
 
 
 if __name__ == '__main__':
