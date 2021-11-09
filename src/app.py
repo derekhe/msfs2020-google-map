@@ -1,4 +1,6 @@
 import time
+
+import os.path
 import socket
 import ctypes
 import requests
@@ -64,6 +66,13 @@ class MainWindow:
 
         root.protocol("WM_DELETE_WINDOW", self.quit)
 
+        self.startup_checks()
+
+        self.root = root
+        self.server_process = None
+        self.nginx_process = None
+
+    def startup_checks(self):
         if not self.is_admin():
             messagebox.showerror(
                 message='Please run in Administrator mode, application will close')
@@ -74,9 +83,15 @@ class MainWindow:
                 message='You have application using 443 port, please close them, application will close')
             exit(-1)
 
-        self.root = root
-        self.server_process = None
-        self.nginx_process = None
+        current_path = os.path.abspath(os.getcwd())
+        if not current_path.isascii():
+            messagebox.showerror(
+                message=f"Your current path({current_path}) contains non-ascii characters, the mod won't run. \n"
+                        f"Please move the entire folder into folder not contains non-ascii characters. \n"
+                        f"If not sure, move to root folder of disk driver (D:\\ or E:\\)\n"
+                        f"Application will close now"
+            )
+            exit(-1)
 
     def create_proxy_settings(self, parent):
         row = 1
