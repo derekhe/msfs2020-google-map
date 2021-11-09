@@ -12,6 +12,7 @@ from multiprocessing import Process
 from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips
 from server import run_server, clear_cache
 from settings import Settings
+from threading import Thread
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -137,18 +138,11 @@ class MainWindow:
 
     def create_help(self, parent):
         row = 1
-        ttk.Label(parent, text="Please always check latest version").grid(column=1, row=row, sticky=(W, E))
-        ttk.Button(parent, text="Open Latest release page",
-                   command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")).grid(
-            column=2, row=row, sticky=(W, E))
-
-        row += 1
-        ttk.Label(parent, text="First time intro").grid(column=1, row=row, sticky=(W, E))
+        ttk.Label(parent, text="First time intro (VERY IMPORTANT)").grid(column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Open Introduction and Usage page",
                    command=lambda: webbrowser.open("https://www.youtube.com/watch?v=Lk7GK5XLTt8")).grid(column=2,
                                                                                                         row=row,
                                                                                                         sticky=(W, E))
-
         row += 1
         ttk.Label(parent, text="Discussion").grid(column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Open FlightSim.to homepage",
@@ -156,6 +150,16 @@ class MainWindow:
                        "https://zh.flightsim.to/file/19345/msfs-2020-google-map-replacement")).grid(
             column=2,
             row=row, sticky=(W, E))
+
+        row += 1
+        ttk.Label(parent, text="Please always check latest version").grid(column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Open Latest release page",
+                   command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/releases")).grid(
+            column=2, row=row, sticky=(W, E))
+
+        row += 1
+        ttk.Label(parent, text="Please try disable your firewall and antivirus tools if you have trouble").grid(
+            column=1, row=row, sticky=(W, E), columnspan=2)
 
         for child in parent.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -188,7 +192,7 @@ class MainWindow:
     def request_google(self):
         return requests.get(
             f"https://{self.selected_google_server.get()}/vt/lyrs=s&x=1&y=1&z=1", timeout=3,
-            proxies={"https": self.settings.proxy_url})
+            proxies={"https": self.settings.proxy_url}, verify=False)
 
     @staticmethod
     def enable_features(template: str):
@@ -225,6 +229,7 @@ class MainWindow:
             add_cert()
         except:
             messagebox.showerror(message="Add certificate failed")
+            return
 
         try:
             with open("./src/nginx.conf.template", "rt") as nginx:
@@ -237,11 +242,13 @@ class MainWindow:
         except:
             traceback.print_exc()
             messagebox.showerror(message="Generate nginx file failed")
+            return
 
         try:
             override_hosts()
         except:
             messagebox.showerror(message="Override hosts failed")
+            return
 
         try:
             self.server_process = Process(
@@ -251,8 +258,23 @@ class MainWindow:
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
         except:
-            messagebox.showerror(message="Unable to start")
+            messagebox.showerror(message="Unable to start nginx")
+            return
+
+        Thread(target=self.health_check_thread).start()
+
         self.status.set("Running")
+
+    def health_check_thread(self):
+        err_msg = "Health check failed, the mod is not running properly"
+        try:
+            time.sleep(10)
+            response = requests.get("https://kh.ssl.ak.tiles.virtualearth.net/health", timeout=60, verify=False)
+            if response.text != "alive":
+                messagebox.showerror(message=err_msg)
+            print("Health check passed")
+        except:
+            messagebox.showerror(message=err_msg)
 
     def is_google_accessible(self):
         try:

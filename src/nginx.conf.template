@@ -64,6 +64,12 @@ http {
 
        access_log  logs/virtualearth-access.log;
 
+       location /health {
+          proxy_pass http://localhost:8000/health;
+          proxy_ssl_verify              off;
+          access_log  logs/health-check.log;
+       }
+
 #bing_aerial#       location ~* /tiles/akh.*? {
 #bing_aerial#          proxy_pass http://localhost:8000;
 #bing_aerial#          proxy_pass_request_headers      on;
