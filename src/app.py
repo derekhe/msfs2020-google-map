@@ -111,7 +111,7 @@ class MainWindow:
 
         ttk.Label(parent, text="Proxy").grid(column=1, row=row, )
         ttk.Button(parent, text="Test Connection",
-                   command=self.test_proxy).grid(column=3, row=row, )
+                   command=self.test_google_access).grid(column=3, row=row, )
 
         row += 1
         ttk.Label(parent, text="Try another server if loading speed is slow, you must stop and then run again").grid(
@@ -173,19 +173,22 @@ class MainWindow:
     def google_server_selected(self, event):
         self.settings.google_server = self.selected_google_server.get()
 
-    def test_proxy(self):
+    def test_google_access(self):
         try:
             begin = time.time()
-            response = requests.get(
-                f"https://{self.selected_google_server.get()}/vt/lyrs=s&x=1&y=1&z=1", timeout=3,
-                proxies={"https": self.settings.proxy_url})
+            response = self.request_google()
             duration = time.time() - begin
             if response.status_code == 200:
                 messagebox.showinfo(message=f'Proxy is good, response time is {duration:0.2}s')
             else:
-                messagebox.showerror(message='Connection failed, please check')
+                messagebox.showerror(message='Google access failed, please check')
         except:
-            messagebox.showerror(message='Connection failed, please check')
+            messagebox.showerror(message='Google access failed, please check')
+
+    def request_google(self):
+        return requests.get(
+            f"https://{self.selected_google_server.get()}/vt/lyrs=s&x=1&y=1&z=1", timeout=3,
+            proxies={"https": self.settings.proxy_url})
 
     @staticmethod
     def enable_features(template: str):
@@ -210,6 +213,12 @@ class MainWindow:
         return template
 
     def run(self):
+        if not self.is_google_accessible():
+            messagebox.showerror(message="Google map access failed,\n"
+                                         "please check your connection or setup proxy settings.")
+            self.setting_tabs.select(1)
+            return
+
         self.settings.save()
         self.stop()
         try:
@@ -244,6 +253,15 @@ class MainWindow:
         except:
             messagebox.showerror(message="Unable to start")
         self.status.set("Running")
+
+    def is_google_accessible(self):
+        try:
+            response = self.request_google()
+            if response.status_code != 200:
+                return False
+            return True
+        except:
+            return False
 
     def stop(self):
         if self.server_process is not None:
