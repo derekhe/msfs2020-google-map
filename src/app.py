@@ -158,8 +158,11 @@ class MainWindow:
             column=2, row=row, sticky=(W, E))
 
         row += 1
-        ttk.Label(parent, text="Please try disable your firewall and antivirus tools if you have trouble").grid(
-            column=1, row=row, sticky=(W, E), columnspan=2)
+        ttk.Label(parent, text="Please try disable your firewall\n and antivirus tools if you have trouble").grid(
+            column=1, row=row, sticky=(W, E))
+        ttk.Button(parent, text="Report issue",
+                   command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/issues")).grid(
+            column=2, row=row, sticky=(W, E))
 
         for child in parent.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -228,6 +231,7 @@ class MainWindow:
         try:
             add_cert()
         except:
+            traceback.print_exc()
             messagebox.showerror(message="Add certificate failed")
             return
 
@@ -247,6 +251,7 @@ class MainWindow:
         try:
             override_hosts()
         except:
+            traceback.print_exc()
             messagebox.showerror(message="Override hosts failed")
             return
 
@@ -258,6 +263,7 @@ class MainWindow:
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
         except:
+            traceback.print_exc()
             messagebox.showerror(message="Unable to start nginx")
             return
 
@@ -286,6 +292,8 @@ class MainWindow:
             return False
 
     def stop(self):
+        restore_hosts()
+
         if self.server_process is not None:
             self.server_process.kill()
 
@@ -308,7 +316,6 @@ class MainWindow:
         try:
             self.settings.save()
             self.stop()
-            restore_hosts()
         finally:
             self.root.destroy()
 

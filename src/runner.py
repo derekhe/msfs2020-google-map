@@ -6,7 +6,7 @@ from python_hosts import Hosts, HostsEntry
 
 urllib3.disable_warnings()
 
-__my_hosts = Hosts()
+
 __domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
 
 
@@ -25,15 +25,19 @@ def get_hosts_origin_ips():
 
 
 def override_hosts():
+    print("Overriding hosts")
+    hosts = Hosts()
     for domain in __domains:
-        __my_hosts.remove_all_matching(name=domain)
+        hosts.remove_all_matching(name=domain)
         new_entry = HostsEntry(
             entry_type='ipv4', address='127.0.0.1', names=[domain])
-        __my_hosts.add([new_entry])
-    __my_hosts.write()
+        hosts.add([new_entry])
+    hosts.write()
 
 
 def restore_hosts():
+    print("Restoring hosts")
+    hosts = Hosts()
     for domain in __domains:
-        __my_hosts.remove_all_matching(name=domain)
-    __my_hosts.write()
+        hosts.remove_all_matching(name=domain)
+    hosts.write()
