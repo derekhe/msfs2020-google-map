@@ -164,6 +164,10 @@ class MainWindow:
                    command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/issues")).grid(
             column=2, row=row, sticky=(W, E))
 
+        row += 1
+        ttk.Label(parent, text="Please setup proxy if your access to google is blocked", background="#f1e740").grid(
+            column=1, row=row, sticky=(W, E), columnspan=2)
+
         for child in parent.winfo_children():
             child.grid_configure(padx=5, pady=5)
 
@@ -232,7 +236,7 @@ class MainWindow:
             add_cert()
         except:
             traceback.print_exc()
-            messagebox.showerror(message="Add certificate failed")
+            messagebox.showerror(message=f"Add certificate failed: {traceback.format_exc()}")
             return
 
         try:
@@ -243,16 +247,18 @@ class MainWindow:
 
             with open("./nginx/conf/nginx.conf", "wt") as out:
                 out.write(output)
-        except:
+        except Exception as ex:
             traceback.print_exc()
-            messagebox.showerror(message="Generate nginx file failed")
+            messagebox.showerror(message=f"Generate nginx file failed:\n {traceback.format_exc()}")
             return
 
         try:
             override_hosts()
         except:
             traceback.print_exc()
-            messagebox.showerror(message="Override hosts failed")
+            messagebox.showerror(
+                message=f"Override hosts failed, please try delete the C:\\Windows\\System32\\drivers\\etc\\hosts file, backup it first. Details:\n{traceback.format_exc()}")
+            os.startfile("C:\\Windows\\System32\\drivers\\etc")
             return
 
         try:
@@ -264,7 +270,7 @@ class MainWindow:
                 "nginx.exe", shell=True, cwd="./nginx")
         except:
             traceback.print_exc()
-            messagebox.showerror(message="Unable to start nginx")
+            messagebox.showerror(message=f"Unable to start nginx:\n{traceback.format_exc()}")
             return
 
         Thread(target=self.health_check_thread).start()
