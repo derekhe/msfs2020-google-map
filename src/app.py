@@ -1,5 +1,5 @@
 import time
-
+import atexit
 import os.path
 import socket
 import ctypes
@@ -51,6 +51,13 @@ class MainWindow:
         self.setting_tabs.add(cache_settings, text="Cache")
 
         row += 1
+        ttk.Label(mainframe,
+                  text="Important:\n Click run before you start MSFS2020\n Setup proxy if your access to google is blocked\n Press Stop button before you close",
+                  background="#f1e740").grid(
+            column=1, row=row, sticky=(W, E), columnspan=2)
+
+        row += 1
+
         self.status = StringVar(value="Stopped")
         ttk.Label(mainframe, textvariable=self.status).grid(column=1, row=row)
         ttk.Button(mainframe, text="Run", command=self.run).grid(column=2, row=row)
@@ -164,10 +171,6 @@ class MainWindow:
                    command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/issues")).grid(
             column=2, row=row, sticky=(W, E))
 
-        row += 1
-        ttk.Label(parent, text="Please setup proxy if your access to google is blocked", background="#f1e740").grid(
-            column=1, row=row, sticky=(W, E), columnspan=2)
-
         for child in parent.winfo_children():
             child.grid_configure(padx=5, pady=5)
 
@@ -247,7 +250,7 @@ class MainWindow:
 
             with open("./nginx/conf/nginx.conf", "wt") as out:
                 out.write(output)
-        except Exception as ex:
+        except Exception:
             traceback.print_exc()
             messagebox.showerror(message=f"Generate nginx file failed:\n {traceback.format_exc()}")
             return
@@ -257,7 +260,11 @@ class MainWindow:
         except:
             traceback.print_exc()
             messagebox.showerror(
-                message=f"Override hosts failed, please try delete the C:\\Windows\\System32\\drivers\\etc\\hosts file, backup it first. Details:\n{traceback.format_exc()}")
+                message=f"Override hosts failed, please try delete the C:\\Windows\\System32\\drivers\\etc\\hosts "
+                        f"file, backup it first.\n "
+                        f"If problem still comes, please make sure this file has write permission. Disable your "
+                        f"antivirus or add exception to this file. "
+                        f" Details:\n{traceback.format_exc()}")
             os.startfile("C:\\Windows\\System32\\drivers\\etc")
             return
 
@@ -281,9 +288,18 @@ class MainWindow:
         err_msg = "Health check failed, the mod is not running properly"
         try:
             time.sleep(10)
+            print("Checking mock server health")
             response = requests.get("https://kh.ssl.ak.tiles.virtualearth.net/health", timeout=60, verify=False)
             if response.text != "alive":
                 messagebox.showerror(message=err_msg)
+            print("Mock server health passed")
+
+            print("Checking nginx server health")
+            response = requests.get(
+                "https://khstorelive.azureedge.net/results/v1.20.0/coverage_maps/lod_8/12202100.cov?version=3",
+                timeout=10, verify=False)
+            if response.status_code != 404:
+                messagebox.showerror(message="Nginx not running properly, please try restart the app")
             print("Health check passed")
         except:
             messagebox.showerror(message=err_msg)
@@ -304,7 +320,7 @@ class MainWindow:
             self.server_process.kill()
 
         if self.nginx_process is not None:
-            subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=True)
+            stop_nginx()
             self.nginx_process.wait(1)
             self.nginx_process = None
 
@@ -335,7 +351,22 @@ class MainWindow:
             return result == 0
 
 
+def stop_nginx():
+    subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=True)
+
+
+def restore_system():
+    restore_hosts()
+    stop_nginx()
+
+
 if __name__ == '__main__':
+    try:
+        restore_system()
+    except:
+        pass
+
+    atexit.register(restore_system)
     root = Tk()
     MainWindow(root)
     root.mainloop()

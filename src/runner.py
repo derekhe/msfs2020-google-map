@@ -17,9 +17,9 @@ def add_cert():
 def get_hosts_origin_ips():
     origin_ips = {}
     dns_resolver = dns.resolver.Resolver()
-    dns_resolver.nameservers = ['8.8.8.8', '8.8.4.4', '208.67.222.222', '208.67.220.220', '223.5.5.5']
     for d in __domains:
         origin_ips[d] = dns_resolver.resolve(d)[0].to_text()
+    print(origin_ips)
     return origin_ips
 
 
