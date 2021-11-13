@@ -289,7 +289,9 @@ class MainWindow:
         try:
             time.sleep(10)
             print("Checking mock server health")
-            response = requests.get("https://kh.ssl.ak.tiles.virtualearth.net/health", timeout=60, verify=False)
+            no_proxy = {"http": None, "https": None, }
+            response = requests.get("https://kh.ssl.ak.tiles.virtualearth.net/health", timeout=60, verify=False,
+                                    proxies=no_proxy)
             if response.text != "alive":
                 messagebox.showerror(message=err_msg)
             print("Mock server health passed")
@@ -297,11 +299,12 @@ class MainWindow:
             print("Checking nginx server health")
             response = requests.get(
                 "https://khstorelive.azureedge.net/results/v1.20.0/coverage_maps/lod_8/12202100.cov?version=3",
-                timeout=10, verify=False)
+                timeout=10, verify=False, proxies=no_proxy)
             if response.status_code != 404:
                 messagebox.showerror(message="Nginx not running properly, please try restart the app")
             print("Health check passed")
         except:
+            traceback.print_exc()
             messagebox.showerror(message=err_msg)
 
     def is_google_accessible(self):

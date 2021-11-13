@@ -1,12 +1,17 @@
 import dns
 import subprocess
 import dns.resolver
+import traceback
 import urllib3
 from python_hosts import Hosts, HostsEntry
 
 urllib3.disable_warnings()
 
 __domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
+__default_ip = {
+    'kh.ssl.ak.tiles.virtualearth.net': '104.85.242.213',
+    'khstorelive.azureedge.net': '104.212.68.114'
+}
 
 
 def add_cert():
@@ -15,12 +20,16 @@ def add_cert():
 
 
 def get_hosts_origin_ips():
-    origin_ips = {}
-    dns_resolver = dns.resolver.Resolver()
-    for d in __domains:
-        origin_ips[d] = dns_resolver.resolve(d)[0].to_text()
-    print(origin_ips)
-    return origin_ips
+    try:
+        origin_ips = {}
+        dns_resolver = dns.resolver.Resolver()
+        for d in __domains:
+            origin_ips[d] = dns_resolver.resolve(d)[0].to_text()
+        print(origin_ips)
+        return origin_ips
+    except dns.exception.Timeout:
+        traceback.print_exc()
+        return __default_ip
 
 
 def override_hosts():
