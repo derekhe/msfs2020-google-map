@@ -7,10 +7,7 @@ assignees: ''
 
 ---
 
-BEFORE SUBMIT A BUG, PLEASE VIEW THE VIDEOES:
-* https://youtu.be/Lk7GK5XLTt8
-* https://www.youtube.com/watch?v=E11XsrBdzcg
-* https://www.youtube.com/results?search_query=msfs+2020+google+maps
+BEFORE SUBMIT A BUG, PLEASE READ THE FAQ PAGE HERE: https://github.com/derekhe/msfs2020-google-map/wiki/FAQ
 
 **Describe the bug**
 A clear and concise description of what the bug is.
