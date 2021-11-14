@@ -25,19 +25,7 @@
 
 注意：如果杀毒软件报错，请加入白名单，都是误报；如果报告证书错误，请直接同意，否则加载不出来。
 
-* 下载release压缩包并解压
-* 第一次：安装Python(https://www.python.org/ftp/python/3.9.7/python-3.9.7-amd64.exe)，全部使用默认配置
-* 运行`run.bat`启动程序，设置好proxy并测试代理，确保代理正常使用。
-* 启动模拟飞行，保留命令行的黑窗口
-* 保证游戏中在线地图功能打开（BING DATA WORLD GRAPHICS和PHOTOGRAMMETRY），否则只能获得离线地图
-* 尽情享用吧
-
-如果hosts文件需要手动恢复，请删除
-`C:\Windows\System32\drivers\etc\hosts`文件中的如下两行:
-```
-127.0.0.1	kh.ssl.ak.tiles.virtualearth.net
-127.0.0.1	khstorelive.azureedge.net
-```
+请参考：https://www.bilibili.com/video/BV1Eh411t7on/
 
 ## 背景
 
