@@ -3,7 +3,6 @@ import subprocess
 import dns.resolver
 import traceback
 import urllib3
-from python_hosts import Hosts, HostsEntry
 
 urllib3.disable_warnings()
 
@@ -12,6 +11,8 @@ __default_ip = {
     'kh.ssl.ak.tiles.virtualearth.net': '104.85.242.213',
     'khstorelive.azureedge.net': '104.212.68.114'
 }
+host_path = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+host_entries = [f"\n127.0.0.1 {domain}\n" for domain in __domains]
 
 
 def add_cert():
@@ -34,18 +35,16 @@ def get_hosts_origin_ips():
 
 def override_hosts():
     print("Overriding hosts")
-    hosts = Hosts()
-    for domain in __domains:
-        hosts.remove_all_matching(name=domain)
-        new_entry = HostsEntry(
-            entry_type='ipv4', address='127.0.0.1', names=[domain])
-        hosts.add([new_entry])
-    hosts.write()
+    with open(host_path, "a") as f:
+        f.writelines(host_entries)
 
 
 def restore_hosts():
     print("Restoring hosts")
-    hosts = Hosts()
-    for domain in __domains:
-        hosts.remove_all_matching(name=domain)
-    hosts.write()
+    with open(host_path, "r+") as f:
+        host = f.read()
+        for line in host_entries:
+            host = host.replace(line, "")
+        f.seek(0)
+        f.write(host)
+        f.truncate()

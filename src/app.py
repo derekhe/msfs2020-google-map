@@ -52,7 +52,7 @@ class MainWindow:
 
         row += 1
         ttk.Label(mainframe,
-                  text="Important:\n Click run before you start MSFS2020\n Setup proxy if your access to google is blocked\n Press Stop button before you close",
+                  text="Important:\n* Click run before you start MSFS2020\n* Setup proxy if your access to google is blocked\n* Press Stop button before you close otherwise MSFS2020 will not load",
                   background="#f1e740").grid(
             column=1, row=row, sticky=(W, E), columnspan=2)
 
@@ -355,7 +355,8 @@ class MainWindow:
 
 
 def stop_nginx():
-    subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=True)
+    subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=False, stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL)
 
 
 def restore_system():
