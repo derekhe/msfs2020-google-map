@@ -74,14 +74,9 @@ def tiles(path):
 
     try:
         im = Image.open(io.BytesIO(content))
-        brightness = calc_brightness(im) / 255
-
-        factor = - 2 * math.pow(brightness, 2) + 2 * math.pow(brightness, 3) + 1
-
-        print(url, brightness, factor)
 
         enhancer = ImageEnhance.Brightness(im)
-        im = enhancer.enhance(factor)
+        im = enhancer.enhance(0.7)
         img_byte_arr = io.BytesIO()
         im.save(img_byte_arr, format='jpeg')
         output = img_byte_arr.getvalue()
