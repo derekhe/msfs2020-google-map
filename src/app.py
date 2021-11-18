@@ -227,6 +227,9 @@ class MainWindow:
         return template
 
     def run(self):
+        messagebox.showwarning(title="IMPORTANT",
+                               message="Press the STOP button before you close this mod otherwise MSFS2020 won't work next time!")
+
         if not self.is_google_accessible():
             messagebox.showerror(message="Google map access failed,\n"
                                          "please check your connection or setup proxy settings.")
@@ -370,6 +373,7 @@ if __name__ == '__main__':
     except:
         pass
 
+    webbrowser.open_new("https://github.com/derekhe/msfs2020-google-map/wiki/Welcome")
     atexit.register(restore_system)
     root = Tk()
     MainWindow(root)
