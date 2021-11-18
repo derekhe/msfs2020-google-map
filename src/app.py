@@ -9,7 +9,7 @@ import traceback
 import webbrowser
 from diskcache import Cache
 from multiprocessing import Process
-from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips
+from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips, del_cert
 from server import run_server, clear_cache
 from settings import Settings
 from threading import Thread
@@ -321,6 +321,7 @@ class MainWindow:
 
     def stop(self):
         restore_hosts()
+        del_cert()
 
         if self.server_process is not None:
             self.server_process.kill()

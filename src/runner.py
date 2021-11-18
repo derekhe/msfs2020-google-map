@@ -21,6 +21,10 @@ def add_cert():
     subprocess.run(["certutil", "-addstore", "-f", "root",
                     ".\\certs\\cert.crt"], shell=True, check=True)
 
+def del_cert():
+    subprocess.run(["certutil", "-delstore", "-f", "root",
+                    ".\\certs\\cert.crt"], shell=True, check=True)
+
 
 def get_hosts_origin_ips():
     try:
@@ -30,7 +34,7 @@ def get_hosts_origin_ips():
             origin_ips[d] = dns_resolver.resolve(d)[0].to_text()
         print(origin_ips)
         return origin_ips
-    except dns.exception.Timeout:
+    except:
         traceback.print_exc()
         return __default_ip
 
