@@ -110,4 +110,4 @@ def run_server(cache_size, proxies, google_server):
     __proxies = {"https": proxies}
     __google_server = google_server
 
-    app.run(port=8000, host="0.0.0.0", threaded=True)
+    app.run(port=39871, host="0.0.0.0", threaded=True)
