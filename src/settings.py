@@ -38,6 +38,14 @@ class Settings:
     def google_server(self, url):
         self.conf['google']['server'] = url
 
+    @property
+    def welcome_page_and_warning_enabled(self):
+        return self.conf['general']['warning']
+
+    @welcome_page_and_warning_enabled.setter
+    def welcome_page_and_warning_enabled(self, enabled):
+        self.conf['general']['warning'] = enabled
+
     def save(self):
         with open('config.ini', 'w') as configfile:
             self.conf.write(configfile)

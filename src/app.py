@@ -22,6 +22,9 @@ class MainWindow:
     def __init__(self, root):
         self.settings = Settings()
 
+        if self.is_warning_enabled():
+            webbrowser.open_new("https://github.com/derekhe/msfs2020-google-map/wiki/Welcome")
+
         root.title("MSFS 2020 Google Map")
         root.resizable(False, False)
 
@@ -57,6 +60,13 @@ class MainWindow:
             column=1, row=row, sticky=(W, E), columnspan=2)
 
         row += 1
+        self.warning_status = StringVar(value=self.settings.welcome_page_and_warning_enabled)
+        ttk.Checkbutton(mainframe,
+                        text="I read the welcome and FAQ page\nI know what will happen, don't show me again",
+                        command=self.warning_status_changed, variable=self.warning_status, onvalue='disabled',
+                        offvalue='enabled').grid(column=1, row=row, sticky=(W, E), columnspan=2)
+
+        row += 1
 
         self.status = StringVar(value="Stopped")
         ttk.Label(mainframe, textvariable=self.status).grid(column=1, row=row)
@@ -79,6 +89,9 @@ class MainWindow:
         self.root = root
         self.server_process = None
         self.nginx_process = None
+
+    def warning_status_changed(self):
+        self.settings.welcome_page_and_warning_enabled = self.warning_status.get()
 
     def startup_checks(self):
         if not self.is_admin():
@@ -227,8 +240,9 @@ class MainWindow:
         return template
 
     def run(self):
-        messagebox.showwarning(title="IMPORTANT",
-                               message="Press the STOP button before you close this mod otherwise MSFS2020 won't work next time!")
+        if self.is_warning_enabled():
+            messagebox.showwarning(title="IMPORTANT",
+                                   message="Press the STOP button before you close this mod otherwise MSFS2020 won't work next time!")
 
         if not self.is_google_accessible():
             messagebox.showerror(message="Google map access failed,\n"
@@ -357,6 +371,9 @@ class MainWindow:
             result = sock.connect_ex(('127.0.0.1', 443))
             return result == 0
 
+    def is_warning_enabled(self):
+        return self.settings.welcome_page_and_warning_enabled == "enabled"
+
 
 def stop_nginx():
     subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=False, stdout=subprocess.DEVNULL,
@@ -374,7 +391,6 @@ if __name__ == '__main__':
     except:
         pass
 
-    webbrowser.open_new("https://github.com/derekhe/msfs2020-google-map/wiki/Welcome")
     atexit.register(restore_system)
     root = Tk()
     MainWindow(root)
