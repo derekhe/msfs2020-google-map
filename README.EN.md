@@ -5,17 +5,17 @@
 The methods mentioned in this tutorial are for research and learning purposes only. I am not responsible for any legal liabilities and losses caused by using or expanding this tutorial and method.
 
 ## Important
-ALWAYS checkout latest version here first if you have trouble: https://github.com/derekhe/msfs2020-google-map/releases
+**ALWAYS** checkout latest version [here](https://github.com/derekhe/msfs2020-google-map/releases) first if you have trouble
 
 **!!!!!MUST DO BEFORE YOU USE THIS MOD!!!!!**
 
 PLEASE VIEW THE VIDEO FOR INSTALLATION AND USAGE: https://youtu.be/Lk7GK5XLTt8
 
-SweViver made this great comparsion and installation here: https://www.youtube.com/watch?v=E11XsrBdzcg
+SweViver made this great comparsion and installation [here](https://www.youtube.com/watch?v=E11XsrBdzcg)
 
 **Some people use cracked verison of MSFS, please don't use this mod, it is not supported.**
 
-If you have any problem, please watch the videoes first and look at this FAQ page: https://github.com/derekhe/msfs2020-google-map/wiki/FAQ
+If you have any problem, please watch the videoes first and look at this [FAQ page](https://github.com/derekhe/msfs2020-google-map/wiki/FAQ)
 
 ## Donate
 I will keep this mod up to date for every MSFS update as much as I can. If you like this plugin and want to offer me a coffee, please click the "DONATE ME A COFFEE" button, or here is the link: https://paypal.me/siconghe?country.x=C2&locale.x=en_US
