@@ -29,13 +29,11 @@ Microsoft Flight Simulator 2020 uses Bing's satellite map imagery. However, the 
 ## Original Map
 ![Original map](./doc/compare-1.jpg)
 
-### By replacing the imagery with Google Maps' data you get much higer quality scenery
+## By replacing the imagery with Google Maps' data you get much higer quality scenery
 
-## A Small Town
-
-### Using Bing Maps
+### A Small Town Using Bing Maps
 ![A small town](./doc/compare-2.jpg)
-### Using Google Maps
+### A Small Town Using Google Maps
 ![A small town](./doc/compare-3.png)
 
 ### Qinghai Lake (These satellite images do not exist using Bing's data)
