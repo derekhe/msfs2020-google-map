@@ -24,18 +24,18 @@ Thanks for your support!
 
 ## Background
 
-Microsoft Flight Simulator 2020 uses Bing's satellite map imagery. However, the satellite maps are relatively old and many areas aren't covered by Bing. This issue occurs in different regions of the world. The Bing imagery on the mainland is from 10 years ago. There are a large number of regions where satellite images are not available. Microsoft uses the program-generated map instead, and the quality is very poor compared to acctual satelite imagery. However, after enabling the Google Maps replacer the image quality and details have been significantly improved, as shown in the images below
+Microsoft Flight Simulator 2020 uses Bing's satellite map imagery. However, the satellite maps are relatively old and many areas aren't covered by Bing. This issue occurs in different regions of the world. The Bing imagery on the mainland is from 10 years ago. There are a large number of regions where satellite images are not available. Microsoft uses the program-generated maps instead to fill in the missing areas, and the quality of these generated maps is very poor compared to acctual satelite imagery. However, after enabling the Google Maps replacer the image quality and details have been significantly improved, as shown in the images below
 
 ## Original Map
 ![Original map](./doc/compare-1.jpg)
 
-## By replacing the imagery with Google Maps' data you get much higer quality scenery
+### By replacing the imagery with Google Maps' data you get much higer quality scenery
 
-### A Small Town
+## A Small Town
 
-## Using Bing Maps
+### Using Bing Maps
 ![A small town](./doc/compare-2.jpg)
-## Using Google Maps
+### Using Google Maps
 ![A small town](./doc/compare-3.png)
 
 ### Qinghai Lake (These satellite images do not exist using Bing's data)
@@ -59,7 +59,6 @@ I have been studying the possibility of replacing it with Google Maps for a long
 
 Later I studied the network request and found that MSFS will download pictures from Bing's server. In theory, it should be possible to replace the pictures with other pictures. And it happens that the slicing method of bing and google’s satellite images is similar and can be seamlessly switched, and even Microsoft also provides the converted [source code](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) (see this function QuadKeyToTileXY)
 
-In the process of constant search, I found [examples similar to my thinking](
-https://github.com/muumimorko/MSFS2020_CGLTools/issues/2#issuecomment-762232597). But his main purpose is to remove some unnecessary things to improve the quality of the landscape. He also built an additional warehouse to demonstrate a [method of using proxy to replace landscape] (https://github.com/muumimorko/MSFS2020_Proxy). Unfortunately, this warehouse lacks some necessary things and cannot operate normally.
+In the process of constant search, I found [examples similar to my thinking](https://github.com/muumimorko/MSFS2020_CGLTools/issues/2#issuecomment-762232597). But his main purpose is to remove some unnecessary things to improve the quality of the landscape. He also built an additional warehouse to demonstrate a [method of using proxy to replace landscape](https://github.com/muumimorko/MSFS2020_Proxy). Unfortunately, this warehouse lacks some necessary things and cannot operate normally.
 
 ![IMG](https://user-images.githubusercontent.com/9518369/104909810-173dfb00-5991-11eb-8e17-4063deb7ab8f.jpg)
