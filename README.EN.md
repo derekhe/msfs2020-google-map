@@ -18,7 +18,7 @@ SweViver made this great comparsion and installation [here](https://www.youtube.
 If you have any problem, please watch the videoes first and look at this [FAQ page](https://github.com/derekhe/msfs2020-google-map/wiki/FAQ)
 
 ## Donate
-I will keep this mod up to date for every MSFS update as much as I can. If you like this plugin and want to offer me a coffee, please click the "BUY ME A COFFEE" button, or alternatively here is the link: https://paypal.me/siconghe?country.x=C2&locale.x=en_US
+I will keep this mod up to date for every MSFS update as much as I can. If you like this plugin and want to offer me a coffee, please click the "BUY ME A COFFEE" button, or alternatively here is the link if you'd like to use [PayPal](https://paypal.me/siconghe?country.x=C2&locale.x=en_US)
 
 Thanks for your support! 
 
