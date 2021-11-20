@@ -13,7 +13,7 @@ PLEASE VIEW THE VIDEO FOR INSTALLATION AND USAGE: https://youtu.be/Lk7GK5XLTt8
 
 SweViver made this great comparsion and installation here: https://www.youtube.com/watch?v=E11XsrBdzcg
 
-**Some people use cracked verison of MSFS, please don't use this mod, it is not supported.
+**Some people use cracked verison of MSFS, please don't use this mod, it is not supported.**
 
 If you have any problem, please watch the videoes first and look at this FAQ page: https://github.com/derekhe/msfs2020-google-map/wiki/FAQ
 
