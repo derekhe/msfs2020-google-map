@@ -24,18 +24,21 @@ Thanks for your support!
 
 ## Background
 
-Microsoft Flight Simulator 2020 uses Bing's satellite map. However, the satellite map is relatively old, and many areas are not directly equipped with map settings a few years ago. This phenomenon occurs in different regions of the world. The map on the mainland is even 10 years ago. There are a large number of regions where satellite images are not available. Microsoft uses the program-generated map instead, and the quality is very poor. After the replacement, the image quality and details have been significantly improved, as shown in the figure below
+Microsoft Flight Simulator 2020 uses Bing's satellite map imagery. However, the satellite maps are relatively old and many areas aren't covered by Bing. This issue occurs in different regions of the world. The Bing imagery on the mainland is from 10 years ago. There are a large number of regions where satellite images are not available. Microsoft uses the program-generated map instead, and the quality is very poor compared to acctual satelite imagery. However, after enabling the Google Maps replacer the image quality and details have been significantly improved, as shown in the images below
 
-## Original map
+## Original Map
 ![Original map](./doc/compare-1.jpg)
 
-## You can get the latest high-definition images after replacing Google Maps
+## By replacing the imagery with Google Maps' data you get much higer quality scenery
 
-### A small town
+### A Small Town
+
+## Using Bing Maps
 ![A small town](./doc/compare-2.jpg)
+## Using Google Maps
 ![A small town](./doc/compare-3.png)
 
-### Qinghai Lake (These satellite images do not exist in Bing)
+### Qinghai Lake (These satellite images do not exist using Bing's data)
 
 ![Qinghai Lake](./doc/lake.jpg)
 ![Qinghai Lake](./doc/lake-2.jpg)
