@@ -8,7 +8,7 @@ The methods mentioned in this tutorial are for research and learning purposes on
 - **ALWAYS** checkout latest version [here](https://github.com/derekhe/msfs2020-google-map/releases) first if you have trouble
 <br>
 
-<u>**MUST DO BEFORE USING THIS MOD**</u>
+**❗MUST DO BEFORE USING THIS MOD❗**
 
 - PLEASE VIEW THE VIDEO FOR INSTALLATION AND USAGE: https://youtu.be/Lk7GK5XLTt8
 
