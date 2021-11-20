@@ -18,11 +18,11 @@ SweViver made this great comparsion and installation [here](https://www.youtube.
 If you have any problem, please watch the videoes first and look at this [FAQ page](https://github.com/derekhe/msfs2020-google-map/wiki/FAQ)
 
 ## Donate
-I will keep this mod up to date for every MSFS update as much as I can. If you like this plugin and want to offer me a coffee, please click the "DONATE ME A COFFEE" button, or here is the link: https://paypal.me/siconghe?country.x=C2&locale.x=en_US
+I will keep this mod up to date for every MSFS update as much as I can. If you like this plugin and want to offer me a coffee, please click the "BUY ME A COFFEE" button, or alternatively here is the link: https://paypal.me/siconghe?country.x=C2&locale.x=en_US
 
 Thanks for your support! 
 
-## background
+## Background
 
 Microsoft Flight Simulator 2020 uses Bing's satellite map. However, the satellite map is relatively old, and many areas are not directly equipped with map settings a few years ago. This phenomenon occurs in different regions of the world. The map on the mainland is even 10 years ago. There are a large number of regions where satellite images are not available. Microsoft uses the program-generated map instead, and the quality is very poor. After the replacement, the image quality and details have been significantly improved, as shown in the figure below
 
