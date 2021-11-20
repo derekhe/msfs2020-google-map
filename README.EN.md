@@ -45,9 +45,9 @@ Microsoft Flight Simulator 2020 uses Bing's satellite map. However, the satellit
 
 ![Chengdu](./doc/chengdu.png)
 
-### Hongkong
+### Hong Kong
 
-![Hongkong](./doc/hongkong.jpg)
+![Hong Kong](./doc/hongkong.jpg)
 
 
 ## History and related information
