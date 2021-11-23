@@ -119,7 +119,7 @@ class MainWindow:
         ttk.Label(parent,
                   text="Proxy format: http://ip:port or socks5h://ip:port"
                        "\nExample: http://192.168.10.1:8080 or socks5h://192.168.10.10:1080"
-                       "\nNote: leave blank if you don't need proxy to access google").grid(
+                       "\n\nNote: leave blank if you don't need proxy to access google").grid(
             column=1, row=row, sticky=W, columnspan=3)
 
         row += 1
