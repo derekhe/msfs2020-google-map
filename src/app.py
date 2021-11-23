@@ -55,7 +55,7 @@ class MainWindow:
 
         row += 1
         ttk.Label(mainframe,
-                  text="Important:\n* Click run before you start MSFS2020\n* Setup proxy if your access to google is blocked\n* Press Stop button before you close otherwise MSFS2020 will not load",
+                  text="Important:\n• Click run before you start MSFS2020\n• Setup proxy if your access to google is blocked\n• Press Stop button before you close otherwise MSFS2020 will not load",
                   background="#f1e740").grid(
             column=1, row=row, sticky=(W, E), columnspan=2)
 
@@ -74,7 +74,7 @@ class MainWindow:
         ttk.Button(mainframe, text="Stop", command=self.stop).grid(column=3, row=row)
 
         row += 1
-        ttk.Label(mainframe, text="If you like this mod, please help me improve it by donate",
+        ttk.Label(mainframe, text="If you like this mod, please help me improve it by donating",
                   background="#f1e740").grid(column=1, row=row,
                                              columnspan=2)
         ttk.Button(mainframe, text="Donate", command=self.donate).grid(column=3, row=row)
@@ -119,7 +119,7 @@ class MainWindow:
         ttk.Label(parent,
                   text="Proxy format: http://ip:port or socks5h://ip:port"
                        "\nExample: http://192.168.10.1:8080 or socks5h://192.168.10.10:1080"
-                       "\nNote: leave blank if you don't need proxy to access google").grid(
+                       "\n\nNote: Leave blank if you don't need proxy to access google").grid(
             column=1, row=row, sticky=W, columnspan=3)
 
         row += 1
@@ -141,7 +141,7 @@ class MainWindow:
 
     def create_google_map_settings(self, parent):
         row = 1
-        ttk.Label(parent, text="Google server").grid(column=1, row=row, )
+        ttk.Label(parent, text="Google Maps Server").grid(column=1, row=row, )
 
         self.selected_google_server = StringVar()
         google_server_combo = ttk.Combobox(parent, textvariable=self.selected_google_server)
@@ -158,14 +158,14 @@ class MainWindow:
 
     def create_help(self, parent):
         row = 1
-        ttk.Label(parent, text="First time intro (VERY IMPORTANT)").grid(column=1, row=row, sticky=(W, E))
+        ttk.Label(parent, text="First time info (VERY IMPORTANT)").grid(column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Open Introduction and Usage page",
                    command=lambda: webbrowser.open("https://www.youtube.com/watch?v=Lk7GK5XLTt8")).grid(column=2,
                                                                                                         row=row,
                                                                                                         sticky=(W, E))
         row += 1
         ttk.Label(parent, text="Discussion").grid(column=1, row=row, sticky=(W, E))
-        ttk.Button(parent, text="Open FlightSim.to homepage",
+        ttk.Button(parent, text="Open Flightsim.to homepage",
                    command=lambda: webbrowser.open(
                        "https://zh.flightsim.to/file/19345/msfs-2020-google-map-replacement")).grid(
             column=2,
@@ -178,7 +178,7 @@ class MainWindow:
             column=2, row=row, sticky=(W, E))
 
         row += 1
-        ttk.Label(parent, text="Please try disable your firewall\n and antivirus tools if you have trouble").grid(
+        ttk.Label(parent, text="Please try disabling your firewall\nand antivirus tools if you have trouble").grid(
             column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Report issue",
                    command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/issues")).grid(
