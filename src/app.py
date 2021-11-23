@@ -141,7 +141,7 @@ class MainWindow:
 
     def create_google_map_settings(self, parent):
         row = 1
-        ttk.Label(parent, text="Google server").grid(column=1, row=row, )
+        ttk.Label(parent, text="Google Maps Server").grid(column=1, row=row, )
 
         self.selected_google_server = StringVar()
         google_server_combo = ttk.Combobox(parent, textvariable=self.selected_google_server)
