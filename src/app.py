@@ -158,7 +158,7 @@ class MainWindow:
 
     def create_help(self, parent):
         row = 1
-        ttk.Label(parent, text="First time intro (VERY IMPORTANT)").grid(column=1, row=row, sticky=(W, E))
+        ttk.Label(parent, text="First time info (VERY IMPORTANT)").grid(column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Open Introduction and Usage page",
                    command=lambda: webbrowser.open("https://www.youtube.com/watch?v=Lk7GK5XLTt8")).grid(column=2,
                                                                                                         row=row,
