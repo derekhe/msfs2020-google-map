@@ -55,7 +55,7 @@ class MainWindow:
 
         row += 1
         ttk.Label(mainframe,
-                  text="Important:\n* Click run before you start MSFS2020\n* Setup proxy if your access to google is blocked\n* Press Stop button before you close otherwise MSFS2020 will not load",
+                  text="Important:\n• Click run before you start MSFS2020\n• Setup proxy if your access to google is blocked\n• Press Stop button before you close otherwise MSFS2020 will not load",
                   background="#f1e740").grid(
             column=1, row=row, sticky=(W, E), columnspan=2)
 
