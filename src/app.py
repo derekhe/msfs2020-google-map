@@ -74,7 +74,7 @@ class MainWindow:
         ttk.Button(mainframe, text="Stop", command=self.stop).grid(column=3, row=row)
 
         row += 1
-        ttk.Label(mainframe, text="If you like this mod, please help me improve it by donate",
+        ttk.Label(mainframe, text="If you like this mod, please help me improve it by donating",
                   background="#f1e740").grid(column=1, row=row,
                                              columnspan=2)
         ttk.Button(mainframe, text="Donate", command=self.donate).grid(column=3, row=row)
