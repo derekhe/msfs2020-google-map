@@ -165,7 +165,7 @@ class MainWindow:
                                                                                                         sticky=(W, E))
         row += 1
         ttk.Label(parent, text="Discussion").grid(column=1, row=row, sticky=(W, E))
-        ttk.Button(parent, text="Open FlightSim.to homepage",
+        ttk.Button(parent, text="Open Flightsim.to homepage",
                    command=lambda: webbrowser.open(
                        "https://zh.flightsim.to/file/19345/msfs-2020-google-map-replacement")).grid(
             column=2,
