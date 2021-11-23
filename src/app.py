@@ -178,7 +178,7 @@ class MainWindow:
             column=2, row=row, sticky=(W, E))
 
         row += 1
-        ttk.Label(parent, text="Please try disabling your firewall\n and antivirus tools if you have trouble").grid(
+        ttk.Label(parent, text="Please try disabling your firewall\nand antivirus tools if you have trouble").grid(
             column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Report issue",
                    command=lambda: webbrowser.open("https://github.com/derekhe/msfs2020-google-map/issues")).grid(
