@@ -10,7 +10,7 @@ import webbrowser
 from diskcache import Cache
 from multiprocessing import Process
 from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips, del_cert
-from server import run_server, clear_cache
+from server import run_server, clear_cache, url_mapping
 from settings import Settings
 from threading import Thread
 from tkinter import *
@@ -214,7 +214,7 @@ class MainWindow:
 
     def request_google(self):
         return requests.get(
-            f"https://{self.selected_google_server.get()}/vt/lyrs=s&x=1&y=1&z=1", timeout=3,
+            url_mapping(self.selected_google_server.get(), 1, 1, 1), timeout=3,
             proxies={"https": self.settings.proxy_url}, verify=False)
 
     @staticmethod
@@ -289,7 +289,8 @@ class MainWindow:
             self.server_process = Process(
                 target=run_server,
                 args=(
-                self.settings.cache_size, self.settings.proxy_url, self.settings.google_server, get_hosts_origin_ips()))
+                    self.settings.cache_size, self.settings.proxy_url, self.settings.google_server,
+                    get_hosts_origin_ips()))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")

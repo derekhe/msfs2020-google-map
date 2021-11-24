@@ -70,13 +70,19 @@ def mtx(dummy=None):
         response.headers[k] = v
     return response
 
+def url_mapping(server, tile_x, tile_y, level_of_detail):
+    if "mt" in server:
+        return f"https://{server}/vt/lyrs=s&x={tile_x}&y={tile_y}&z={level_of_detail}"
+
+    if "khms" in server:
+        return f"https://{server}/kh/v=908?x={tile_x}&y={tile_y}&z={level_of_detail}"
 
 @app.route("/tiles/akh<path>")
 def tiles(path):
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
     tile_x, tile_y, level_of_detail = quad_key_to_tile_xy(quadkey)
 
-    url = f"https://{__google_server}/vt/lyrs=s&x={tile_x}&y={tile_y}&z={level_of_detail}"
+    url = url_mapping(__google_server, tile_x, tile_y, level_of_detail)
 
     cache_key = f"{level_of_detail}{tile_x}{tile_y}"
     content = __cache.get(cache_key)
