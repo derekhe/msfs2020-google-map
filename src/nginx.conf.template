@@ -1,4 +1,4 @@
-worker_processes  1;
+worker_processes  8;
 
 error_log  logs/error.log;
 error_log  logs/error.log  notice;
@@ -73,6 +73,14 @@ http {
 #bing_aerial#       location ~* /tiles/akh.*? {
 #bing_aerial#          proxy_pass http://localhost:39871;
 #bing_aerial#          proxy_pass_request_headers      on;
+#bing_aerial#          proxy_ssl_verify              off;
+#bing_aerial#          access_log  logs/localgoogle-access.log;
+#bing_aerial#       }
+
+#bing_aerial#       location ~* /tiles/mtx.*? {
+#bing_aerial#          proxy_pass http://localhost:39871;
+#bing_aerial#          proxy_pass_request_headers      on;
+#bing_aerial#          proxy_set_header Host kh.ssl.ak.tiles.virtualearth.net;
 #bing_aerial#          proxy_ssl_verify              off;
 #bing_aerial#          access_log  logs/localgoogle-access.log;
 #bing_aerial#       }

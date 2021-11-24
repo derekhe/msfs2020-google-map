@@ -8,13 +8,14 @@ import traceback
 import urllib3
 from PIL import Image, ImageEnhance, ImageStat
 from diskcache import Cache
-from flask import Flask, make_response, Response
+from flask import Flask, make_response, Response, request
 
 urllib3.disable_warnings()
 
 __cache: Cache = None
 __proxies = None
 __google_server = "mt1.google.com"
+__original_ips = None
 app = Flask(__name__)
 
 
@@ -48,6 +49,26 @@ def clear_cache():
 def calc_brightness(im):
     stat = ImageStat.Stat(im.convert('L'))
     return stat.rms[0]
+
+
+@app.route('/tiles/mtx<dummy>')
+def mtx(dummy=None):
+    print("Handing request to", request.url)
+    request_header = {}
+    for k, v in request.headers:
+        request_header[k] = v
+
+    print("Downloading from:", request.url)
+
+    url = request.url.replace(request.host, "kh.ssl.ak.tiles.virtualearth.net.edgekey.net").replace("http://","https://")
+
+    remote_response = requests.get(
+        url, proxies=__proxies, timeout=30, verify=False, headers=request_header)
+
+    response = make_response(remote_response.content)
+    for k, v in remote_response.headers.items():
+        response.headers[k] = v
+    return response
 
 
 @app.route("/tiles/akh<path>")
@@ -98,11 +119,12 @@ def tiles(path):
     return response
 
 
-def run_server(cache_size, proxies, google_server):
-    global __cache, __proxies, __google_server
+def run_server(cache_size, proxies, google_server, original_ips):
+    global __cache, __proxies, __google_server, __original_ips
     __cache = Cache(
         "./cache", size_limit=int(cache_size) * 1024 * 1024 * 1024, shards=10)
     __proxies = {"https": proxies}
     __google_server = google_server
+    __original_ips = original_ips
 
     app.run(port=39871, host="0.0.0.0", threaded=True)

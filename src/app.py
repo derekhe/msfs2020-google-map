@@ -288,7 +288,8 @@ class MainWindow:
         try:
             self.server_process = Process(
                 target=run_server,
-                args=(self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
+                args=(
+                self.settings.cache_size, self.settings.proxy_url, self.settings.google_server, get_hosts_origin_ips()))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
