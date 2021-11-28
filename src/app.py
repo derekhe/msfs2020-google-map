@@ -9,7 +9,7 @@ import traceback
 import webbrowser
 from diskcache import Cache
 from multiprocessing import Process
-from runner import add_cert, override_hosts, restore_hosts, get_hosts_origin_ips, del_cert
+from runner import add_cert, override_hosts, restore_hosts, del_cert
 from server import run_server, clear_cache, url_mapping
 from settings import Settings
 from threading import Thread
@@ -233,12 +233,6 @@ class MainWindow:
                 out = out.replace(f"#{feature}#", "")
         return out
 
-    @staticmethod
-    def config_dns(template: str):
-        for k, v in get_hosts_origin_ips().items():
-            template = template.replace(f"#{k}#", v)
-        return template
-
     def run(self):
         if self.is_warning_enabled():
             messagebox.showwarning(title="IMPORTANT",
@@ -260,19 +254,6 @@ class MainWindow:
             return
 
         try:
-            with open("./src/nginx.conf.template", "rt") as nginx:
-                template = nginx.read()
-                output = self.enable_features(template)
-                output = self.config_dns(output)
-
-            with open("./nginx/conf/nginx.conf", "wt") as out:
-                out.write(output)
-        except Exception:
-            traceback.print_exc()
-            messagebox.showerror(message=f"Generate nginx file failed:\n {traceback.format_exc()}")
-            return
-
-        try:
             override_hosts()
         except:
             traceback.print_exc()
@@ -289,8 +270,7 @@ class MainWindow:
             self.server_process = Process(
                 target=run_server,
                 args=(
-                    self.settings.cache_size, self.settings.proxy_url, self.settings.google_server,
-                    get_hosts_origin_ips()))
+                    self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")

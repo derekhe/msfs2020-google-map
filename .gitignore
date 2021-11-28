@@ -5,6 +5,5 @@ build/
 .vscode/
 nginx/logs/
 nginx/temp/
-nginx/conf/nginx.conf
 .idea/
 Python39/*

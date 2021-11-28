@@ -15,7 +15,6 @@ urllib3.disable_warnings()
 __cache: Cache = None
 __proxies = None
 __google_server = "mt1.google.com"
-__original_ips = None
 app = Flask(__name__)
 
 
@@ -125,12 +124,11 @@ def tiles(path):
     return response
 
 
-def run_server(cache_size, proxies, google_server, original_ips):
-    global __cache, __proxies, __google_server, __original_ips
+def run_server(cache_size, proxies, google_server):
+    global __cache, __proxies, __google_server
     __cache = Cache(
         "./cache", size_limit=int(cache_size) * 1024 * 1024 * 1024, shards=10)
     __proxies = {"https": proxies}
     __google_server = google_server
-    __original_ips = original_ips
 
     app.run(port=39871, host="0.0.0.0", threaded=True)
