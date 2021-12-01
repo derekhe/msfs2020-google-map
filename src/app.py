@@ -1,6 +1,7 @@
 import atexit
 import ctypes
 import os.path
+import random
 import socket
 import subprocess
 import time
@@ -47,10 +48,6 @@ class MainWindow:
         proxy_settings = ttk.Frame(self.setting_tabs, padding=10)
         self.create_proxy_settings(proxy_settings)
         self.setting_tabs.add(proxy_settings, text='Proxy')
-
-        google_map_server_settings = ttk.Frame(self.setting_tabs, padding=10)
-        self.create_google_map_settings(google_map_server_settings)
-        self.setting_tabs.add(google_map_server_settings, text='Map Server')
 
         cache_settings = ttk.Frame(self.setting_tabs, padding=10)
         self.create_cache_settings(cache_settings)
@@ -218,7 +215,7 @@ class MainWindow:
 
     def request_google(self) -> Response:
         return requests.get(
-            url_mapping(self.selected_google_server.get(), 1, 1, 1), timeout=3,
+            url_mapping(random.choice(self.settings.google_servers), 1, 1, 1), timeout=3,
             proxies={"https": self.settings.proxy_url}, verify=False)
 
     @staticmethod
@@ -274,7 +271,7 @@ class MainWindow:
             self.server_process = Process(
                 target=run_server,
                 args=(
-                    self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
+                    self.settings.cache_size, self.settings.proxy_url))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")

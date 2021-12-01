@@ -1,3 +1,5 @@
+import math
+
 import io
 import re
 import traceback
@@ -84,6 +86,7 @@ def tiles(path: str) -> Response:
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
     tile_x, tile_y, level_of_detail = quad_key_to_tile_xy(quadkey)
 
+    __google_server = random.choice(__google_servers)
     url = url_mapping(__google_server, tile_x, tile_y, level_of_detail)
 
     cache_key = f"{level_of_detail}{tile_x}{tile_y}"
@@ -132,6 +135,5 @@ def run_server(cache_size, proxies, google_server) -> None:
     __cache = Cache(
         "./cache", size_limit=int(cache_size) * 1024 * 1024 * 1024, shards=10)
     __proxies = {"https": proxies}
-    __google_server = google_server
 
     app.run(port=39871, host="0.0.0.0", threaded=True)
