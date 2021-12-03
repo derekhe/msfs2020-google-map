@@ -31,6 +31,14 @@ class Settings:
                 "khms3.google.com", 'mt1.google.com', 'mt2.google.com', 'mt3.google.com']
 
     @property
+    def google_server(self):
+        return self.conf['google']['server']
+
+    @google_server.setter
+    def google_server(self, url):
+        self.conf['google']['server'] = url
+
+    @property
     def google_server(self) -> str:
         return self.conf['google']['server']
 
