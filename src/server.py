@@ -77,7 +77,7 @@ def url_mapping(server: str, tile_x: int, tile_y: int, level_of_detail: int) -> 
     if "mt" in server:
         return f"https://{server}/vt/lyrs=s&x={tile_x}&y={tile_y}&z={level_of_detail}"
 
-    if "khms" in server:
+    if "khm" in server:
         return f"https://{server}/kh/v=908?x={tile_x}&y={tile_y}&z={level_of_detail}"
 
 

@@ -27,8 +27,7 @@ class Settings:
 
     @property
     def google_servers(self) -> list[str]:
-        return ["khms1.google.com", "khms2.google.com",
-                "khms3.google.com", 'mt1.google.com', 'mt2.google.com', 'mt3.google.com']
+        return ["khm.google.com", 'mt.google.com']
 
     @property
     def google_server(self):
