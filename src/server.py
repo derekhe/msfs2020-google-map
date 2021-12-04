@@ -1,19 +1,14 @@
-import math
-
+import PIL
 import io
 import re
-import traceback
-
-import PIL
 import requests
+import traceback
 import urllib3
-from PIL import Image, ImageEnhance, ImageStat
-from diskcache import Cache
+from PIL import Image, ImageEnhance
 from flask import Flask, make_response, Response, request
 
 urllib3.disable_warnings()
 
-__cache: Cache
 __proxies: None = None
 __google_server: str = "mt1.google.com"
 app: Flask = Flask(__name__)
@@ -38,18 +33,6 @@ def quad_key_to_tile_xy(quad_key: str) -> tuple[int, int, int]:
 @app.route("/health")
 def health() -> str:
     return "alive"
-
-
-@app.route("/cache", methods=["DELETE"])
-def clear_cache() -> Response:
-    __cache.clear()
-    return Response(status=200)
-
-
-# Is this even used anywhere? Pycharm Find Usages can't find anything
-def calc_brightness(im: any) -> str:
-    stat = ImageStat.Stat(im.convert('L'))
-    return stat.rms[0]
 
 
 @app.route('/tiles/mtx<dummy>')
@@ -88,20 +71,14 @@ def tiles(path: str) -> Response:
 
     url = url_mapping(__google_server, tile_x, tile_y, level_of_detail)
 
-    cache_key = f"{level_of_detail}{tile_x}{tile_y}"
-    content = __cache.get(cache_key)
-    if content is None:
-        print("Downloading from:", url, __proxies)
-        resp = requests.get(
-            url, proxies=__proxies, timeout=30)
+    print("Downloading from:", url, __proxies)
+    resp = requests.get(
+        url, proxies=__proxies, timeout=30)
 
-        if resp.status_code != 200:
-            return Response(status=404)
+    if resp.status_code != 200:
+        return Response(status=404)
 
-        content = resp.content
-        __cache.set(cache_key, content)
-    else:
-        print("Use cached:", url)
+    content = resp.content
 
     try:
         im = Image.open(io.BytesIO(content))
@@ -129,10 +106,8 @@ def tiles(path: str) -> Response:
     return response
 
 
-def run_server(cache_size, proxies, google_server) -> None:
-    global __cache, __proxies, __google_server
-    __cache = Cache(
-        "./cache", size_limit=int(cache_size) * 1024 * 1024 * 1024, shards=10)
+def run_server(proxies, google_server) -> None:
+    global __proxies, __google_server
     __proxies = {"https": proxies}
     __google_server = google_server
 

@@ -1,24 +1,22 @@
 import atexit
+import time
+
 import ctypes
 import os.path
+import requests
 import socket
 import subprocess
-import time
 import traceback
 import webbrowser
 from multiprocessing import Process
+from requests import Response
+from runner import add_cert, override_hosts, restore_hosts, del_cert
+from server import run_server, url_mapping
+from settings import Settings
 from threading import Thread
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-
-import requests
-from diskcache import Cache, Timeout
-from requests import Response
-
-from runner import add_cert, override_hosts, restore_hosts, del_cert
-from server import run_server, url_mapping
-from settings import Settings
 
 
 class MainWindow:
@@ -51,10 +49,6 @@ class MainWindow:
         google_map_server_settings = ttk.Frame(self.setting_tabs, padding=10)
         self.create_google_map_settings(google_map_server_settings)
         self.setting_tabs.add(google_map_server_settings, text='Map Server')
-
-        cache_settings = ttk.Frame(self.setting_tabs, padding=10)
-        self.create_cache_settings(cache_settings)
-        self.setting_tabs.add(cache_settings, text="Cache")
 
         row += 1
         ttk.Label(mainframe,
@@ -153,11 +147,6 @@ class MainWindow:
         google_server_combo.grid(column=2, row=row, )
         google_server_combo.bind('<<ComboboxSelected>>', self.google_server_selected)
         self.selected_google_server.set(self.settings.google_server)
-
-    def create_cache_settings(self, parent: any) -> None:
-        row = 1
-        ttk.Button(parent, text="Clear cache", command=self.clear_cache
-                   ).grid(column=4, row=row)
 
     @staticmethod
     def create_help(parent: any) -> None:
@@ -274,7 +263,7 @@ class MainWindow:
             self.server_process = Process(
                 target=run_server,
                 args=(
-                    self.settings.cache_size, self.settings.proxy_url, self.settings.google_server))
+                    self.settings.proxy_url, self.settings.google_server))
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
@@ -333,14 +322,6 @@ class MainWindow:
             self.nginx_process = None
 
         self.status.set("Stopped")
-
-    @staticmethod
-    def clear_cache() -> None:
-        try:
-            Cache("./cache").clear()
-            messagebox.showinfo(message="Cache cleared")
-        except Timeout:
-            messagebox.showinfo(message="Cache clean failed")
 
     def quit(self) -> None:
         try:

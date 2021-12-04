@@ -22,10 +22,6 @@ class Settings:
             self.conf['proxy']['url'] = proxy_url
 
     @property
-    def cache_size(self) -> str:
-        return self.conf['offline']['max_cache_size_G']
-
-    @property
     def google_servers(self) -> list[str]:
         return ["khm.google.com", 'mt.google.com']
 
