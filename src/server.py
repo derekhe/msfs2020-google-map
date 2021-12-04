@@ -1,10 +1,9 @@
-import math
-
 import io
 import re
-
-import requests
 import traceback
+
+import PIL
+import requests
 import urllib3
 from PIL import Image, ImageEnhance, ImageStat
 from diskcache import Cache
@@ -12,13 +11,13 @@ from flask import Flask, make_response, Response, request
 
 urllib3.disable_warnings()
 
-__cache: Cache = None
-__proxies = None
-__google_server = "mt1.google.com"
-app = Flask(__name__)
+__cache: Cache
+__proxies: None = None
+__google_server: str = "mt1.google.com"
+app: Flask = Flask(__name__)
 
 
-def quad_key_to_tile_xy(quad_key):
+def quad_key_to_tile_xy(quad_key: str) -> tuple[int, int, int]:
     tile_x = tile_y = 0
     level_of_detail = len(quad_key)
     for i in range(level_of_detail, 0, -1):
@@ -35,23 +34,24 @@ def quad_key_to_tile_xy(quad_key):
 
 
 @app.route("/health")
-def health():
+def health() -> str:
     return "alive"
 
 
 @app.route("/cache", methods=["DELETE"])
-def clear_cache():
+def clear_cache() -> Response:
     __cache.clear()
     return Response(status=200)
 
 
-def calc_brightness(im):
+# Is this even used anywhere? Pycharm Find Usages can't find anything
+def calc_brightness(im: any) -> str:
     stat = ImageStat.Stat(im.convert('L'))
     return stat.rms[0]
 
 
 @app.route('/tiles/mtx<dummy>')
-def mtx(dummy=None):
+def mtx(dummy: str = None) -> Response:
     print("Handing request to", request.url)
     request_header = {}
     for k, v in request.headers:
@@ -59,7 +59,8 @@ def mtx(dummy=None):
 
     print("Downloading from:", request.url)
 
-    url = request.url.replace(request.host, "kh.ssl.ak.tiles.virtualearth.net.edgekey.net").replace("http://","https://")
+    url = request.url.replace(request.host, "kh.ssl.ak.tiles.virtualearth.net.edgekey.net").replace("http://",
+                                                                                                    "https://")
 
     remote_response = requests.get(
         url, proxies=__proxies, timeout=30, verify=False, headers=request_header)
@@ -69,15 +70,17 @@ def mtx(dummy=None):
         response.headers[k] = v
     return response
 
-def url_mapping(server, tile_x, tile_y, level_of_detail):
+
+def url_mapping(server: str, tile_x: int, tile_y: int, level_of_detail: int) -> str:
     if "mt" in server:
         return f"https://{server}/vt/lyrs=s&x={tile_x}&y={tile_y}&z={level_of_detail}"
 
     if "khms" in server:
         return f"https://{server}/kh/v=908?x={tile_x}&y={tile_y}&z={level_of_detail}"
 
+
 @app.route("/tiles/akh<path>")
-def tiles(path):
+def tiles(path: str) -> Response:
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
     tile_x, tile_y, level_of_detail = quad_key_to_tile_xy(quadkey)
 
@@ -106,7 +109,7 @@ def tiles(path):
         img_byte_arr = io.BytesIO()
         im.save(img_byte_arr, format='jpeg')
         output = img_byte_arr.getvalue()
-    except:
+    except FileNotFoundError or PIL.UnidentifiedImageError or ValueError or TypeError:
         print("Image adjust failed, use original picture")
         output = content
         traceback.print_exc()
@@ -124,7 +127,7 @@ def tiles(path):
     return response
 
 
-def run_server(cache_size, proxies, google_server):
+def run_server(cache_size, proxies, google_server) -> None:
     global __cache, __proxies, __google_server
     __cache = Cache(
         "./cache", size_limit=int(cache_size) * 1024 * 1024 * 1024, shards=10)

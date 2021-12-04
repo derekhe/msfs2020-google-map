@@ -1,29 +1,27 @@
-import dns
 import os
 import stat
 import subprocess
-import dns.resolver
-import traceback
+
 import urllib3
 
 urllib3.disable_warnings()
 
-__domains = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
-host_path = "C:\\Windows\\System32\\drivers\\etc\\hosts"
-host_entries = [f"\n127.0.0.1 {domain}\n" for domain in __domains]
+__domains: list[str] = ['kh.ssl.ak.tiles.virtualearth.net', 'khstorelive.azureedge.net']
+host_path: str = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+host_entries: list[str] = [f"\n127.0.0.1 {domain}\n" for domain in __domains]
 
 
-def add_cert():
+def add_cert() -> None:
     subprocess.run(["certutil", "-addstore", "-f", "root",
                     ".\\certs\\cert.crt"], shell=True, check=True)
 
 
-def del_cert():
+def del_cert() -> None:
     subprocess.run(["certutil", "-delstore", "-f", "root",
                     ".\\certs\\cert.crt"], shell=True, check=True)
 
 
-def override_hosts():
+def override_hosts() -> None:
     print("Overriding hosts")
     os.chmod(host_path, stat.S_IWRITE)
     with open(host_path, "a") as f:
@@ -31,7 +29,7 @@ def override_hosts():
     print("Hosts override")
 
 
-def restore_hosts():
+def restore_hosts() -> None:
     print("Restoring hosts")
     os.chmod(host_path, stat.S_IWRITE)
     with open(host_path, "r+") as f:

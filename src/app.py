@@ -1,25 +1,28 @@
-import time
 import atexit
+import ctypes
 import os.path
 import socket
-import ctypes
-import requests
 import subprocess
+import time
 import traceback
 import webbrowser
-from diskcache import Cache
 from multiprocessing import Process
-from runner import add_cert, override_hosts, restore_hosts, del_cert
-from server import run_server, clear_cache, url_mapping
-from settings import Settings
 from threading import Thread
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 
+import requests
+from diskcache import Cache, Timeout
+from requests import Response
+
+from runner import add_cert, override_hosts, restore_hosts, del_cert
+from server import run_server, url_mapping
+from settings import Settings
+
 
 class MainWindow:
-    def __init__(self, root):
+    def __init__(self, root: any) -> None:
         self.settings = Settings()
 
         if self.is_warning_enabled():
@@ -90,10 +93,10 @@ class MainWindow:
         self.server_process = None
         self.nginx_process = None
 
-    def warning_status_changed(self):
+    def warning_status_changed(self) -> None:
         self.settings.welcome_page_and_warning_enabled = self.warning_status.get()
 
-    def startup_checks(self):
+    def startup_checks(self) -> None:
         if not self.is_admin():
             messagebox.showerror(
                 message='Please run in Administrator mode, application will close')
@@ -114,7 +117,7 @@ class MainWindow:
             )
             exit(-1)
 
-    def create_proxy_settings(self, parent):
+    def create_proxy_settings(self, parent: any) -> None:
         row = 1
         ttk.Label(parent,
                   text="Proxy format: http://ip:port or socks5h://ip:port"
@@ -139,7 +142,7 @@ class MainWindow:
             column=1, row=row, columnspan=3,
             sticky=W)
 
-    def create_google_map_settings(self, parent):
+    def create_google_map_settings(self, parent: any) -> None:
         row = 1
         ttk.Label(parent, text="Google Maps Server").grid(column=1, row=row, )
 
@@ -151,12 +154,13 @@ class MainWindow:
         google_server_combo.bind('<<ComboboxSelected>>', self.google_server_selected)
         self.selected_google_server.set(self.settings.google_server)
 
-    def create_cache_settings(self, parent):
+    def create_cache_settings(self, parent: any) -> None:
         row = 1
         ttk.Button(parent, text="Clear cache", command=self.clear_cache
                    ).grid(column=4, row=row)
 
-    def create_help(self, parent):
+    @staticmethod
+    def create_help(parent: any) -> None:
         row = 1
         ttk.Label(parent, text="First time info (VERY IMPORTANT)").grid(column=1, row=row, sticky=(W, E))
         ttk.Button(parent, text="Open Introduction and Usage page",
@@ -188,19 +192,19 @@ class MainWindow:
             child.grid_configure(padx=5, pady=5)
 
     @staticmethod
-    def is_admin():
+    def is_admin() -> bool:
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
-        except:
+        except Exception:
             return False
 
-    def proxy_address_updated(self, *args):
+    def proxy_address_updated(self, *args: list[str]) -> None:
         self.settings.proxy_url = self.proxy_address.get()
 
-    def google_server_selected(self, event):
+    def google_server_selected(self, event: str) -> None:
         self.settings.google_server = self.selected_google_server.get()
 
-    def test_google_access(self):
+    def test_google_access(self) -> None:
         try:
             begin = time.time()
             response = self.request_google()
@@ -209,16 +213,16 @@ class MainWindow:
                 messagebox.showinfo(message=f'Proxy is good, response time is {duration:0.2}s')
             else:
                 messagebox.showerror(message='Google access failed, please check')
-        except:
+        except Exception:
             messagebox.showerror(message='Google access failed, please check')
 
-    def request_google(self):
+    def request_google(self) -> Response:
         return requests.get(
             url_mapping(self.selected_google_server.get(), 1, 1, 1), timeout=3,
             proxies={"https": self.settings.proxy_url}, verify=False)
 
     @staticmethod
-    def enable_features(template: str):
+    def enable_features(template: str) -> str:
         features_disabled = {
             "tsom_cc_activation_masks": True,
             "coverage_maps": True,
@@ -233,7 +237,7 @@ class MainWindow:
                 out = out.replace(f"#{feature}#", "")
         return out
 
-    def run(self):
+    def run(self) -> None:
         if self.is_warning_enabled():
             messagebox.showwarning(title="IMPORTANT",
                                    message="Press the STOP button before you close this mod otherwise MSFS2020 won't work next time!")
@@ -248,14 +252,14 @@ class MainWindow:
         self.stop()
         try:
             add_cert()
-        except:
+        except Exception:
             traceback.print_exc()
             messagebox.showerror(message=f"Add certificate failed: {traceback.format_exc()}")
             return
 
         try:
             override_hosts()
-        except:
+        except Exception:
             traceback.print_exc()
             messagebox.showerror(
                 message=f"Override hosts failed, please try delete the C:\\Windows\\System32\\drivers\\etc\\hosts "
@@ -274,7 +278,7 @@ class MainWindow:
             self.server_process.start()
             self.nginx_process = subprocess.Popen(
                 "nginx.exe", shell=True, cwd="./nginx")
-        except:
+        except Exception:
             traceback.print_exc()
             messagebox.showerror(message=f"Unable to start nginx:\n{traceback.format_exc()}")
             return
@@ -283,7 +287,8 @@ class MainWindow:
 
         self.status.set("Running")
 
-    def health_check_thread(self):
+    @staticmethod
+    def health_check_thread() -> None:
         err_msg = "Health check failed, the mod is not running properly"
         try:
             time.sleep(10)
@@ -302,20 +307,20 @@ class MainWindow:
             if response.status_code != 404:
                 messagebox.showerror(message="Nginx not running properly, please try restart the app")
             print("Health check passed")
-        except:
+        except Exception:
             traceback.print_exc()
             messagebox.showerror(message=err_msg)
 
-    def is_google_accessible(self):
+    def is_google_accessible(self) -> bool:
         try:
             response = self.request_google()
             if response.status_code != 200:
                 return False
             return True
-        except:
+        except Exception:
             return False
 
-    def stop(self):
+    def stop(self) -> None:
         restore_hosts()
         del_cert()
 
@@ -330,39 +335,40 @@ class MainWindow:
         self.status.set("Stopped")
 
     @staticmethod
-    def clear_cache():
+    def clear_cache() -> None:
         try:
             Cache("./cache").clear()
             messagebox.showinfo(message="Cache cleared")
-        except:
+        except Timeout:
             messagebox.showinfo(message="Cache clean failed")
 
-    def quit(self):
+    def quit(self) -> None:
         try:
             self.settings.save()
             self.stop()
         finally:
             self.root.destroy()
 
-    def donate(self):
+    @staticmethod
+    def donate() -> None:
         webbrowser.open("https://www.paypal.com/paypalme/siconghe?country.x=C2&locale.x=en_US")
 
     @staticmethod
-    def is_443_occupied():
+    def is_443_occupied() -> bool:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             result = sock.connect_ex(('127.0.0.1', 443))
             return result == 0
 
-    def is_warning_enabled(self):
+    def is_warning_enabled(self) -> bool:
         return self.settings.welcome_page_and_warning_enabled == "enabled"
 
 
-def stop_nginx():
+def stop_nginx() -> None:
     subprocess.run("taskkill /F /IM nginx.exe", shell=True, check=False, stdout=subprocess.DEVNULL,
                    stderr=subprocess.DEVNULL)
 
 
-def restore_system():
+def restore_system() -> None:
     restore_hosts()
     stop_nginx()
 
@@ -370,7 +376,7 @@ def restore_system():
 if __name__ == '__main__':
     try:
         restore_system()
-    except:
+    except Exception:
         pass
 
     atexit.register(restore_system)
