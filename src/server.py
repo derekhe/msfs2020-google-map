@@ -2,6 +2,7 @@ import io
 import re
 import traceback
 
+import PIL
 import requests
 import urllib3
 from PIL import Image, ImageEnhance, ImageStat
@@ -44,7 +45,7 @@ def clear_cache() -> Response:
 
 
 # Is this even used anywhere? Pycharm Find Usages can't find anything
-def calc_brightness(im: str) -> str:
+def calc_brightness(im: any) -> str:
     stat = ImageStat.Stat(im.convert('L'))
     return stat.rms[0]
 
@@ -58,7 +59,8 @@ def mtx(dummy: str = None) -> Response:
 
     print("Downloading from:", request.url)
 
-    url = request.url.replace(request.host, "kh.ssl.ak.tiles.virtualearth.net.edgekey.net").replace("http://","https://")
+    url = request.url.replace(request.host, "kh.ssl.ak.tiles.virtualearth.net.edgekey.net").replace("http://",
+                                                                                                    "https://")
 
     remote_response = requests.get(
         url, proxies=__proxies, timeout=30, verify=False, headers=request_header)
@@ -107,7 +109,7 @@ def tiles(path: str) -> Response:
         img_byte_arr = io.BytesIO()
         im.save(img_byte_arr, format='jpeg')
         output = img_byte_arr.getvalue()
-    except:
+    except FileNotFoundError or PIL.UnidentifiedImageError or ValueError or TypeError:
         print("Image adjust failed, use original picture")
         output = content
         traceback.print_exc()
