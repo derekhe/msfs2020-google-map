@@ -1,6 +1,8 @@
 import os
 from configparser import ConfigParser
 
+from src.google_servers import GOOGLE_SERVERS
+
 
 class Settings:
     def __init__(self):
@@ -22,16 +24,12 @@ class Settings:
             self.conf['proxy']['url'] = proxy_url
 
     @property
-    def google_servers(self) -> list[str]:
-        return ["khm.google.com", 'mt.google.com']
+    def cache_size(self) -> str:
+        return self.conf['offline']['max_cache_size_G']
 
     @property
-    def google_server(self):
-        return self.conf['google']['server']
-
-    @google_server.setter
-    def google_server(self, url):
-        self.conf['google']['server'] = url
+    def google_servers(self) -> list[str]:
+        return GOOGLE_SERVERS
 
     @property
     def google_server(self) -> str:
