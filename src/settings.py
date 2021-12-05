@@ -24,12 +24,16 @@ class Settings:
             self.conf['proxy']['url'] = proxy_url
 
     @property
-    def cache_size(self) -> str:
-        return self.conf['offline']['max_cache_size_G']
-
-    @property
     def google_servers(self) -> list[str]:
         return GOOGLE_SERVERS
+
+    @property
+    def google_server(self) -> str:
+        return self.conf['google']['server']
+
+    @google_server.setter
+    def google_server(self, url):
+        self.conf['google']['server'] = url
 
     @property
     def google_server(self) -> str:
