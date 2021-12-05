@@ -9,8 +9,13 @@ from PIL import Image, ImageEnhance, ImageStat, UnidentifiedImageError
 from diskcache import Cache
 from flask import Flask, make_response, Response, request
 
+# Experiment with rate limiting the incoming requests so that not so many are pumped out towards
+# Google Maps. This may or may not work with Flask routes!
+from pyrate_limiter import Duration, RequestRate, Limiter
+
 # See coment in tiles() on how this is used to round-robin through all Google Maps servers
 from google_servers import GOOGLE_SERVERS
+
 _google_server_loop = itertools.cycle(GOOGLE_SERVERS)
 
 urllib3.disable_warnings()
@@ -25,6 +30,10 @@ _TENTWENTYFOURCUBED = 1024 * 1024 * 1024
 
 app: Flask = Flask(__name__)
 
+# Rate limiting: This needs to be heuristically determined unless it's somewhere hidden in the API documents
+gmaps_rate = RequestRate(5, Duration.SECOND)  # 5 per second
+limiter = Limiter(gmaps_rate)
+
 
 @app.route("/health")
 def health() -> str:
@@ -37,6 +46,7 @@ def clear_cache() -> Response:
     return Response(status=200)
 
 
+@limiter.ratelimit("mtx", delay=True)
 @app.route('/tiles/mtx<dummy>')
 def mtx(dummy: str = None) -> Response:
     print("Handing request to", request.url)
@@ -57,14 +67,12 @@ def mtx(dummy: str = None) -> Response:
     return response
 
 
+@limiter.ratelimit("akh", delay=True)
 @app.route("/tiles/akh<path>")
 def tiles(path: str) -> Response:
     quadkey = re.findall(r"(\d+).jpeg", path)[0]
     tile_x, tile_y, level_of_detail = _quad_key_to_tile_xy(quadkey)
 
-    # url = url_mapping(__google_server, tile_x, tile_y, level_of_detail)
-    # There seem to be issues where Google Maps is throttling download attempts from a single IP, especially
-    # when it's the first flight and a LOT of queries are fired off to fill the cache.
     # This attempts to round-robin the queries from the entire list of Google Maps servers in the list
     # (replacing the ability to choose one)
     next_server = next(_google_server_loop)
