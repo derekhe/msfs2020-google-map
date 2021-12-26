@@ -62,7 +62,9 @@ def url_mapping(server: str, tile_x: int, tile_y: int, level_of_detail: int) -> 
 
     if "khm" in server:
         return f"https://{server}/kh/v=908?x={tile_x}&y={tile_y}&z={level_of_detail}"
-
+    
+    if "mapbox" in server:
+        return f"https://{server}/v4/mapbox.satellite/{level_of_detail}/{tile_x}/{tile_y}.jpg?sku=101AdikDMLlCK&access_token=yourToken"
 
 @app.route("/tiles/akh<path>")
 def tiles(path: str) -> Response:
