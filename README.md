@@ -1,3 +1,7 @@
+# New version available and this repo will be read only.
+
+Please see the new repo here: https://github.com/derekhe/msfs2020-google-map-electron
+
 # [English version here](./README.EN.md)
 
 # 中文
