@@ -1,6 +1,8 @@
 import os
 from configparser import ConfigParser
 
+from src.google_servers import GOOGLE_SERVERS
+
 
 class Settings:
     def __init__(self):
@@ -23,10 +25,10 @@ class Settings:
 
     @property
     def google_servers(self) -> list[str]:
-        return ["khm.google.com", 'mt.google.com']
+        return GOOGLE_SERVERS
 
     @property
-    def google_server(self):
+    def google_server(self) -> str:
         return self.conf['google']['server']
 
     @google_server.setter

@@ -10,8 +10,8 @@ import traceback
 import webbrowser
 from multiprocessing import Process
 from requests import Response
-from runner import add_cert, override_hosts, restore_hosts, del_cert
-from server import run_server, url_mapping
+from hostshandler import add_cert, override_hosts, restore_hosts, del_cert
+from flask_server import run_server, url_mapping
 from settings import Settings
 from threading import Thread
 from tkinter import *
