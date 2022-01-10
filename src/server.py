@@ -64,7 +64,10 @@ def url_mapping(server: str, tile_x: int, tile_y: int, level_of_detail: int) -> 
         return f"https://{server}/kh/v=908?x={tile_x}&y={tile_y}&z={level_of_detail}"
     
     if "mapbox" in server:
-        return f"https://{server}/v4/mapbox.satellite/{level_of_detail}/{tile_x}/{tile_y}.jpg?sku=101AdikDMLlCK&access_token=yourToken"
+        return f"https://{server}/v4/mapbox.satellite/{level_of_detail}/{tile_x}/{tile_y}.jpg?sku=cky8e1hd40jus15nzunvf7q4u&access_token=pk.eyJ1IjoiaDB3YXJkIiwiYSI6ImNreG5td3UxajFwNW4ybnBudWtvdmw4bjEifQ.mbmam48LS8GaSWYXUOrNUQ"
+    
+    if "arcgisonline" in server:
+        return f"https://{server}/ArcGIS/rest/services/World_Imagery/MapServer/tile/{level_of_detail}/{tile_y}/{tile_x}"
 
 @app.route("/tiles/akh<path>")
 def tiles(path: str) -> Response:

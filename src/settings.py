@@ -23,7 +23,7 @@ class Settings:
 
     @property
     def google_servers(self) -> list[str]:
-        return ['mt.google.com','khm.google.com',"api.mapbox.com"]
+        return ['mt.google.com','khm.google.com',"api.mapbox.com","services.arcgisonline.com"]
 
     @property
     def google_server(self):
